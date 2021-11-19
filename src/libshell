@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+
+confirm()
+{
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [Y/n]} " response
+    case "$response" in
+        [yY][eE][sS]|[yY]|"") 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+abort()
+{
+    echo "${1:-abort}"
+    exit 1
+}
+
+

@@ -1,0 +1,20 @@
+#!/usr/bin/bash
+
+basedir="$(dirname "$0")"
+. "$basedir/libshell"
+
+inpath=$1
+outpath=$2
+
+if [[ ! -f $inpath ]] || [[ $inpath != *.img ]]; then
+    echo file error
+    exit 1
+fi
+
+confirm || abort
+
+echo sudo dd if=$inpath of=$outpath bs=4M conv=fsync status=progress
+
+sudo dd if="$inpath" of="$outpath" bs=4M conv=fsync status=progress
+
+

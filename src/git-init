@@ -1,0 +1,30 @@
+#!/usr/bin/bash
+
+if [[ ! $# == 3 ]]; then
+    echo "Illegal number of parameters" >&2
+    exit 2
+fi
+
+user=$1
+repo=$2
+token=$3
+
+dest=./.gitignore
+if [[ ! -f $dest ]]; then
+    echo "*** create gitignore"
+    sudo tee -a $dest > /dev/null << 'EOF'
+**/autre/
+**/build/
+*.pro.user
+
+EOF
+fi
+
+git init
+git add .gitignore
+git commit -m "initial commit"
+git branch -M master
+git remote add origin https://$token@github.com/$user/$repo.git
+git push -u origin master
+
+
