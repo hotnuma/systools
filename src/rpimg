@@ -11,9 +11,9 @@ if [[ ! -f $inpath ]] || [[ $inpath != *.img ]]; then
     exit 1
 fi
 
-confirm || abort
-
 echo sudo dd if=$inpath of=$outpath bs=4M conv=fsync status=progress
+
+confirm || abort
 
 sudo dd if="$inpath" of="$outpath" bs=4M conv=fsync status=progress
 
