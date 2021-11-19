@@ -17,8 +17,8 @@
 	```
 	Download sources :
 	```
-	git clone https://github.com/hotnuma/misctools.git
-	cd misctools
+	git clone https://github.com/hotnuma/systools.git
+	cd systools
 	./install.sh
 	```
 * src/git-init
