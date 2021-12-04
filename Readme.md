@@ -1,53 +1,54 @@
-# Misc Tools
+# Sys Tools
 
 * Installation
 	
-	apt :
-	```
-	sudo apt install build-essential git meson ninja-build
-	```
-	pacman :
-	```
-	sudo pacman -S base-devel git meson ninja
-	```
-	First utilisation of git :
-	```
-	git config --global user.name "John Doe"
-	git config --global user.email johndoe@example.com
-	```
-	Download sources :
-	```
-	git clone https://github.com/hotnuma/systools.git
-	cd systools
-	./install.sh
-	```
-* src/git-init
+    ```
+    git clone https://github.com/hotnuma/systools.git
+    cd systools
+    ./install.sh
+    ```
+* apt-update
 
-    Initialise git repos :
-	```
+    Execute apt upgrade & apt full-upgrade
+    
+* conf-reload
+
+    Reload xfconf daemon
+    
+* git-check
+
+    Execute git-status on all subdirectories
+    
+* git-init
+
+    ```
     git-init user repos token
-	```
-* src/git-push
+    ```
+* git-push
 
-    Push changes :
-	```
+    Push local changes to git
+    ```
     git-push "comment"
-	```
-* src/libshell
+    ```
+* git-status
+
+    Test repository status
+    
+* libshell
 
     Shell library.
     
-* src/qninja
+* qninja
 
-    Wrapper to use ninja with QtCreator.
+    Ninja wrapper to use with QtCreator.
     
-* src/rpimg
+* rpimg
 
-    Write image to SD Card :
-	```
+    Write an img file to SD Card
+    ```
     rpimg 'my_file.img' /dev/sdc
-	```
-* src/testsh
+    ```
+* testsh
 
     Test script.
     
