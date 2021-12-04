@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+# execute git-status on all subdirectories
+
+for dir in $PWD/*; do
+	subdir=$dir/.git
+	if [[ -d $subdir ]]; then
+		cd $dir
+		echo $subdir
+		git-status
+	fi
+done
+
