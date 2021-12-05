@@ -15,7 +15,6 @@ data_files = [
     'src/libshell',
     'src/qninja',
     'src/rpimg',
-    'src/testsh',
 ]
 
 install_data(
