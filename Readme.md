@@ -48,7 +48,3 @@
     ```
     rpimg 'my_file.img' /dev/sdc
     ```
-* testsh
-
-    Test script.
-    
