@@ -1,19 +1,35 @@
 #!/usr/bin/bash
 
+mdconvert()
+{
+    if [[ "${1: -3}" != ".md" ]]; then
+        echo "*** wrong file type : $1"
+        return
+    fi
+
+    inpath=$1
+    outpath=${inpath%.md}.html
+    opts="--html --tables --fenced-code --autolink --strikethrough --disable-intra-emphasis"
+
+    echo "convert : $1"
+    
+    hoedown $opts $inpath > $outpath
+}
+
+if [[ $# == 0 ]]; then
+    for file in $PWD/*.md; do
+        if [[ -f $file ]]; then
+            mdconvert $file
+        fi
+    done
+    exit 0
+fi
+
 if [[ $# != 1 ]]; then
     echo "usage: md2html file.md"
     exit 1
 fi
 
-inpath=$1
-outpath=${inpath%.md}.html
-opts="--html --tables --fenced-code --autolink --strikethrough --disable-intra-emphasis"
-
-if [[ "${inpath: -3}" != ".md" ]];then
-    echo "usage: md2html file.md"
-    exit 1
-fi
-
-hoedown $opts $inpath > $outpath
+mdconvert $1
 
 
