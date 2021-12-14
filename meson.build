@@ -13,7 +13,7 @@ data_files = [
     'src/git-push',
     'src/git-status',
     'src/libshell',
-    'src/md2html',
+    'src/mdconv',
     'src/qninja',
     'src/rpimg',
 ]
