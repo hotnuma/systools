@@ -31,7 +31,7 @@
 * git-init
 
     ```
-    git-init user repos token
+    git-init home repos token
     ```
 * git-push
 
