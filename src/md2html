@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+
+if [[ $# != 1 ]]; then
+    echo "usage: md2html file.md"
+    exit 1
+fi
+
+inpath=$1
+outpath=${inpath%.md}.html
+opts="--html --tables --fenced-code --autolink --strikethrough --disable-intra-emphasis"
+
+if [[ "${inpath: -3}" != ".md" ]];then
+    echo "usage: md2html file.md"
+    exit 1
+fi
+
+hoedown $opts $inpath > $outpath
+
+
