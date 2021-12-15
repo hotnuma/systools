@@ -59,6 +59,14 @@ if [[ ! -d $dest ]]; then
 	./install.sh
 fi
 
+dest=~/DevFiles/hoedown
+if [[ ! -d $dest ]]; then
+	cd ~/DevFiles
+	git clone https://github.com/hoedown/hoedown.git
+	cd $dest
+	make && sudo make install
+fi
+
 dest=~/DevFiles/memload
 if [[ ! -d $dest ]]; then
 	cd ~/DevFiles
