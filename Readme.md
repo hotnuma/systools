@@ -7,6 +7,15 @@
     cd systools
     ./install.sh
     ```
+
+* Build hoedown
+    
+    ```
+    git clone https://github.com/hoedown/hoedown.git
+    cd hoedown
+    make && sudo make install
+    ```
+
 * apt-update
 
     Execute apt upgrade & apt full-upgrade
@@ -22,7 +31,7 @@
 * git-init
 
     ```
-    git-init user repos token
+    git-init home repos token
     ```
 * git-push
 
@@ -38,6 +47,16 @@
 
     Shell library.
     
+* mdconv
+
+    Convert md file to html.
+    ```
+    mdconv file.md
+    ```
+    Convert all md files in current directory.
+    ```
+    mdconv
+    ```
 * qninja
 
     Ninja wrapper to use with QtCreator.
