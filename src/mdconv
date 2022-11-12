@@ -16,20 +16,35 @@ mdconvert()
     hoedown $opts $inpath > $outpath
 }
 
-if [[ $# == 0 ]]; then
-    for file in $PWD/*.md; do
+mdparse()
+{
+    if [[ ! -d $1 ]]; then
+        echo "*** wrong directory : $1"
+        return
+    fi
+
+    for file in $1/*.md; do
         if [[ -f $file ]]; then
             mdconvert $file
         fi
     done
+}
+
+if [[ $# == 0 ]]; then
+    mdparse $PWD
     exit 0
+elif [[ $# == 1 ]]; then
+    if [[ -d $1 ]]; then
+        mdparse $1
+        exit 0
+    elif [[ -f $1 ]]; then
+        mdconvert $1
+        exit 0
+    fi
 fi
 
-if [[ $# != 1 ]]; then
-    echo "usage: md2html file.md"
-    exit 1
-fi
-
-mdconvert $1
+echo "usage: mdconv file.md"
+echo "usage: mdconv directory"
+exit 1
 
 
