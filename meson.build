@@ -8,6 +8,7 @@ project(
 data_files = [
     'src/apt-update',
     'src/conf-reload',
+    'src/extract.sh',
     'src/git-check',
     'src/git-init',
     'src/git-push',
