@@ -17,7 +17,7 @@ data_files = [
     'src/psmem',
     'src/qninja',
     'src/rpimg',
-    'src/valgen',
+    'src/vrun',
 ]
 
 install_data(
