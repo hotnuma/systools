@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-if [[ ! $# == 1 ]]; then
-    echo "Illegal number of parameters" >&2
-    exit 2
+if [[ $# != 1 ]]; then
+    echo "usage: git-push \"coment\"" >&2
+    exit 1
 fi
 
 comment=$1

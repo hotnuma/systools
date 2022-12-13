@@ -1,5 +1,17 @@
 #!/usr/bin/bash
 
+if [[ $# != 2 ]]; then
+    echo "usage:" >&2
+    echo "lsblk to find witch device and partition" >&2
+    echo "umount to unmount partitions" >&2
+    echo "" >&2
+    echo "example:" >&2
+    echo "lsblk" >&2
+    echo "sudo umount /dev/sdb1" >&2
+    echo "rpimg /path/my_file.img /dev/sdb" >&2
+    exit 1
+fi
+
 basedir="$(dirname "$0")"
 . "$basedir/libshell"
 

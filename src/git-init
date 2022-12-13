@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-if [[ ! $# == 3 ]]; then
+if [[ $# != 3 ]]; then
     echo "usage: git-init home repo token" >&2
-    exit 2
+    exit 1
 fi
 
 home=$1

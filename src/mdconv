@@ -43,6 +43,7 @@ elif [[ $# == 1 ]]; then
     fi
 fi
 
+echo "usage: mdconv"
 echo "usage: mdconv file.md"
 echo "usage: mdconv directory"
 exit 1
