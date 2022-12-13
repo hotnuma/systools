@@ -2,7 +2,7 @@
 
 import sys, os, subprocess
 
-basedir=os.path.realpath(os.path.dirname(__file__))
+basedir=os.getcwd()
 
 argv=sys.argv
 argc=len(argv)
