@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# https://forum.xfce.org/viewtopic.php?pid=54640
-
-cd ~
-killall xfconfd
-/usr/lib/x86_64-linux-gnu/xfce4/xfconf/xfconfd &
-xfsettingsd --replace &
-
