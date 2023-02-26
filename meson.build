@@ -7,6 +7,7 @@ project(
 
 data_files = [
     'src/apt-update',
+    'src/colortest',
     'src/extract.sh',
     'src/git-check',
     'src/git-init',
@@ -17,7 +18,6 @@ data_files = [
     'src/psmem',
     'src/qninja',
     'src/rpimg',
-    'src/vrun',
 ]
 
 install_data(
