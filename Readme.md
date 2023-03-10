@@ -1,6 +1,5 @@
 # Sys Tools
 
-
 * Installation
 	
     ```
@@ -21,9 +20,13 @@
 
     Execute apt upgrade & apt full-upgrade
     
-* conf-reload
+* colortest
 
-    Reload xfconf daemon
+    Show terminal colors
+    
+* extract.sh
+
+    Basic extract script
     
 * git-check
 
