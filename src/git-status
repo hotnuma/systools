@@ -1,6 +1,17 @@
 #!/usr/bin/bash
 
-git remote show origin
-git status
+export LANG=C
+
+result=$(git remote show origin)
+
+if ! echo $result | grep -q "(up to date)" > /dev/null 2>&1; then
+    echo "$result"
+fi
+
+result=$(git status)
+
+if ! echo $result | grep -q "nothing to commit, working tree clean" > /dev/null 2>&1; then
+    echo "$result"
+fi
 
 
