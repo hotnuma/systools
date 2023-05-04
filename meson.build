@@ -8,6 +8,7 @@ project(
 data_files = [
     'src/apt-update',
     'src/colortest',
+    'src/cstyle',
     'src/extract.sh',
     'src/git-check',
     'src/git-init',

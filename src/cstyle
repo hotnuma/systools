@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+
+recursiv=0
+files=""
+
+if [[ $# != 1 ]]; then
+    echo "usage : cstyle -r"
+    echo "usage : cstyle file.c file.h"
+    echo "usage : cstyle *.c *.h"
+    exit 1
+fi
+
+while [[ $# > 0 ]]; do
+    key="$1"
+    case $key in
+        -r)
+        recursiv=1
+        shift
+        ;;
+        *)
+        files+=" $1"
+        shift
+        ;;
+    esac
+done
+
+if [[ $recursiv == 1 ]]; then
+    find . -regex '.*\.\(cpp\|hpp\|cu\|c\|h\)' -exec clang-format --verbose -i {} \;
+else
+    clang-format --verbose -i $files
+fi
+
+
