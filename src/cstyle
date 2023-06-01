@@ -3,7 +3,7 @@
 recursiv=0
 files=""
 
-if [[ $# != 1 ]]; then
+if [[ $# < 1 ]]; then
     echo "usage : cstyle -r"
     echo "usage : cstyle file.c file.h"
     echo "usage : cstyle *.c *.h"
