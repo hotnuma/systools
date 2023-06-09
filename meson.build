@@ -6,7 +6,6 @@ project(
 )
 
 data_files = [
-    'src/ac_converter.py',
     'src/apt-update',
     'src/colortest',
     'src/cstyle',
