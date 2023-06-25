@@ -14,7 +14,6 @@ data_files = [
     'src/git-init',
     'src/git-push',
     'src/git-status',
-    'src/libshell',
     'src/mdconv',
     'src/qninja',
     'src/rpimg',

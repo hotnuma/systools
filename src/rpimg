@@ -1,5 +1,34 @@
 #!/usr/bin/bash
 
+// ----------------------------------------------------------------------------
+
+confirm()
+{
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [Y/n]} " response
+    case "$response" in
+        [yY][eE][sS]|[yY]|"") 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+abort()
+{
+    echo "${1:-abort}"
+    exit 1
+}
+
+// ----------------------------------------------------------------------------
+
+basedir="$(dirname "$0")"
+
+inpath=$1
+outpath=$2
+
 if [[ $# != 2 ]]; then
     echo "usage:" >&2
     echo "lsblk to find witch device and partition" >&2
@@ -11,12 +40,6 @@ if [[ $# != 2 ]]; then
     echo "rpimg /path/my_file.img /dev/sdb" >&2
     exit 1
 fi
-
-basedir="$(dirname "$0")"
-. "$basedir/libshell"
-
-inpath=$1
-outpath=$2
 
 if [[ ! -f $inpath ]] || [[ $inpath != *.img ]]; then
     echo file error
