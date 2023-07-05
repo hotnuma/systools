@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 export LANG=C
+export LANGUAGE=C
 
 result=$(git remote show origin)
 
