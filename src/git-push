@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 if [[ $# != 1 ]]; then
-    echo "usage: git-push \"coment\"" >&2
+    echo "usage: git-push \"comment\"" >&2
     exit 1
 fi
 
