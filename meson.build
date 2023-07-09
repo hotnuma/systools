@@ -6,7 +6,7 @@ project(
 )
 
 data_files = [
-    'src/apt-update',
+    'src/apt-upgrade',
     'src/colortest',
     'src/cstyle',
     'src/extract.sh',
