@@ -1,4 +1,25 @@
 #!/usr/bin/bash
 
-sudo apt update && sudo apt full-upgrade
+while [[ $# > 0 ]]; do
+    key="$1"
+    case $key in
+        dist)
+        sudo apt update && sudo apt dist-upgrade
+        exit 0
+        ;;
+        full)
+        sudo apt update && sudo apt full-upgrade
+        exit 0
+        ;;
+        *)
+        echo "invalid option"
+        echo "abort..."
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+sudo apt update && sudo apt upgrade
+
 
