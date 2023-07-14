@@ -16,6 +16,7 @@ data_files = [
     'src/git-status',
     'src/mdconv',
     'src/qninja',
+    'src/testdd',
     'src/rpimg',
 ]
 

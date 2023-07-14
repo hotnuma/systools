@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+if [[ $# != 1 ]]; then
+    echo "usage:" >&2
+    echo "testdd /tmp/outfile.img" >&2
+    exit 1
+fi
+
+outpath=$1
+
+dd if=/dev/zero of="$outpath" bs=1G count=1 oflag=dsync
+
+
