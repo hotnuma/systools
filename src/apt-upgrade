@@ -1,5 +1,34 @@
 #!/usr/bin/bash
 
+needupdate()
+{
+    dest=/tmp/uptest
+    val=0
+    trigger=900
+
+    if [[ -f $dest ]];then
+        val=$(< $dest)
+    fi
+
+    current=$(date +%s)
+    diff=$(expr $current - $val)
+    echo "$diff"
+    
+    ret=1
+
+    if [ $diff -gt $trigger ]; then
+        ret=0
+    fi
+
+    date +%s > /tmp/uptest
+    
+    return $ret
+}
+
+if needupdate; then
+    echo "update"
+fi
+
 while [[ $# > 0 ]]; do
     key="$1"
     case $key in
