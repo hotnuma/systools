@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-needupdate()
+apt_update()
 {
     dest=/tmp/uptest
     val=0
@@ -12,12 +12,11 @@ needupdate()
 
     current=$(date +%s)
     diff=$(expr $current - $val)
-    echo "$diff"
-    
     ret=1
 
     if [ $diff -gt $trigger ]; then
         ret=0
+        sudo apt update
     fi
 
     date +%s > /tmp/uptest
@@ -25,19 +24,17 @@ needupdate()
     return $ret
 }
 
-if needupdate; then
-    echo "update"
-fi
-
 while [[ $# > 0 ]]; do
     key="$1"
     case $key in
         dist)
-        sudo apt update && sudo apt dist-upgrade
+        apt_update
+        sudo apt dist-upgrade
         exit 0
         ;;
         full)
-        sudo apt update && sudo apt full-upgrade
+        apt_update
+        sudo apt full-upgrade
         exit 0
         ;;
         *)
@@ -49,6 +46,7 @@ while [[ $# > 0 ]]; do
     shift
 done
 
-sudo apt update && sudo apt upgrade
+apt_update
+sudo apt upgrade
 
 
