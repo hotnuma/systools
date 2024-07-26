@@ -27,11 +27,6 @@ apt_update()
 while [[ $# > 0 ]]; do
     key="$1"
     case $key in
-        dist)
-        apt_update
-        sudo apt dist-upgrade
-        exit 0
-        ;;
         full)
         apt_update
         sudo apt full-upgrade
