@@ -24,24 +24,31 @@ apt_update()
     return $ret
 }
 
-while [[ $# > 0 ]]; do
-    key="$1"
-    case $key in
-        full)
-        apt_update
-        sudo apt full-upgrade
-        exit 0
-        ;;
-        *)
-        echo "invalid option"
-        echo "abort..."
-        exit 1
-        ;;
-    esac
-    shift
-done
+if [[ $# > 1 ]]; then
+    echo "too much parameters"
+    echo "abort..."
+    exit 1
+fi
 
-apt_update
-sudo apt upgrade
+if [[ $# == 0 ]]; then
+    echo "apt upgrade..."
+    apt_update
+    sudo apt upgrade
+    exit 0
+fi
+
+case $1 in
+    full)
+    echo "apt full-upgrade..."
+    apt_update
+    sudo apt full-upgrade
+    exit 0
+    ;;
+    *)
+    echo "invalid option"
+    echo "abort..."
+    exit 1
+    ;;
+esac
 
 
