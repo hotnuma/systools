@@ -7,6 +7,7 @@ project(
 
 data_files = [
     'src/apt-upgrade',
+    'src/builddep',
     'src/colortest',
     'src/cstyle',
     'src/extract.sh',
@@ -16,8 +17,9 @@ data_files = [
     'src/git-status',
     'src/mdconv',
     'src/qninja',
-    'src/testdd',
     'src/rpimg',
+    'src/testdd',
+    'src/yfname',
 ]
 
 install_data(

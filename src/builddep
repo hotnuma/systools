@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import subprocess
+
+def runcmd(cmd):
+    ret = subprocess.run(cmd, shell=True, capture_output=True)
+    result = ret.stdout.decode()
+    return result
+
+def create_list(line):
+    itlist = []
+    parts = line.split(", ")
+    for part in parts:
+        it = item(part)
+        itlist.append(it)
+        cmd = "dpkg -l %s | grep ^ii" % (it.name);
+        result = runcmd(cmd)
+        if result != "":
+            it.installed = True
+        
+    return itlist
+
+class item:
+    def __init__(self, pkgitem):
+        parts = pkgitem.split(" ");
+        
+        self.name = parts[0]
+        self.version = ""
+        self.installed = False
+        
+        n = len(parts)
+        if (n > 1):
+            self.version = parts[1]
+
+def main():
+    _list = []
+
+    args = sys.argv
+    size = len(args)
+    if size < 2:
+        exit(1)
+
+    cmd = "apt-cache showsrc %s" % args[1]
+    result = runcmd(cmd)
+    
+    startkey = "Build-Depends: "
+    for line in result.splitlines():
+        if line.startswith(startkey):
+            startlen = len(startkey)
+            line = line[startlen:]
+            _list = create_list(line)
+    
+    print("dependencies ---------------------------------------------------------\n")
+    print("sudo apt install \\")
+    for it in _list:
+        print("%s \\" % it.name)
+    print("")
+    
+    print("not installed --------------------------------------------------------\n")
+    for it in _list:
+        if not it.installed:
+            print("%s" % it.name)
+    print("")
+    
+    return 0
+
+if __name__ == "__main__":
+    main()
+
+
