@@ -16,6 +16,7 @@ data_files = [
     'src/git-push',
     'src/git-status',
     'src/mdconv',
+    'src/pdfmode',
     'src/qninja',
     'src/rpimg',
     'src/testdd',

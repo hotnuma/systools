@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+if [[ $# != 1 ]]; then
+    echo "usage : pdfmode \"myfile.pdf\""
+    echo "abort..."
+    exit 1
+fi
+
+filename=$1
+ext="${filename##*.}"
+
+if [[ ! -f "$filename" ]]; then
+    echo "file doesn't exist"
+    echo "abort..."
+    exit 1
+fi
+
+if [[ $ext != "pdf" ]]; then
+    echo "file is not a pdf"
+    echo "abort..."
+    exit 1
+fi
+
+if [[ -f "${filename}.bak" ]]; then
+    echo "file already converted"
+    echo "abort..."
+    exit 1
+fi
+
+sed -zE 's|(<<[^>]*/PageMode\s*)/FullScreen|\1/UseNone   |' "$filename" > "${filename}.temp"
+mv "$filename" "${filename}.bak"
+mv "${filename}.temp" "$filename"
+
+
