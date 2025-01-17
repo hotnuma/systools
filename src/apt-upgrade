@@ -1,5 +1,14 @@
 #!/usr/bin/bash
 
+show_usage()
+{
+    echo "usage :"
+    echo "apt-upgrade check"
+    echo "apt-upgrade"
+    echo "apt-upgrade full"
+    echo "abort..."
+}
+
 apt_update()
 {
     dest=/tmp/uptest
@@ -25,8 +34,7 @@ apt_update()
 }
 
 if [[ $# > 1 ]]; then
-    echo "too much parameters"
-    echo "abort..."
+    show_usage
     exit 1
 fi
 
@@ -38,6 +46,12 @@ if [[ $# == 0 ]]; then
 fi
 
 case $1 in
+    check)
+    echo "apt list --upgradable..."
+    apt_update
+    apt list --upgradable
+    exit 0
+    ;;
     full)
     echo "apt full-upgrade..."
     apt_update
@@ -45,8 +59,7 @@ case $1 in
     exit 0
     ;;
     *)
-    echo "invalid option"
-    echo "abort..."
+    show_usage
     exit 1
     ;;
 esac
