@@ -1,13 +1,24 @@
 #!/usr/bin/bash
-
 # execute git-status on all subdirectories
 
-for dir in $PWD/*; do
-	subdir=$dir/.git
-	if [[ -d $subdir ]]; then
-		cd $dir
-		echo $subdir
-		git-status
-	fi
-done
+directory=$PWD
+
+check_dir()
+{
+    for dir in $directory/*; do
+        subdir=$dir/.git
+        if [[ -d $subdir ]]; then
+            cd $dir
+            echo $subdir
+            git-status
+        fi
+    done
+}
+
+if [[ $# == 1 ]] && [[ -d "$1" ]]; then
+    
+    directory=$1
+fi
+
+check_dir
 
