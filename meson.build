@@ -1,5 +1,5 @@
 project(
-    'misctools',
+    'systools',
     ['c'],
     version : '1.0',
     license : 'GPL-2.0',
@@ -11,6 +11,7 @@ data_files = [
     'src/colortest',
     'src/cstyle',
     'src/extract.sh',
+    'src/ff',
     'src/git-check',
     'src/git-init',
     'src/git-push',
@@ -28,3 +29,4 @@ install_data(
     data_files,
     install_dir : 'bin',
 )
+
