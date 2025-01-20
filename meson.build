@@ -5,7 +5,18 @@ project(
     license : 'GPL-2.0',
 )
 
-data_files = [
+# install css file in $HOME/.config/
+
+fs = import('fs')
+config_dir = fs.expanduser('~/.config')
+install_data(
+    ['src/style.css',],
+    install_dir : config_dir,
+)
+
+# install sys tools in /usr/local/bin/
+
+systools_files = [
     'src/apt-upgrade',
     'src/builddep',
     'src/colortest',
@@ -26,7 +37,7 @@ data_files = [
 ]
 
 install_data(
-    data_files,
+    systools_files,
     install_dir : 'bin',
 )
 
