@@ -1,5 +1,7 @@
 # Sys Tools
 
+--
+
 * Installation
 	
     ```
@@ -16,25 +18,37 @@
     make && sudo make install
     ```
 
-* Programs
-    
-    apt-update : Execute apt upgrade & apt full-upgrade  
-    builddep : Build dependencies  
-    colortest : Show terminal colors  
-    cstyle : cstyle  
-    extract.sh : Basic extract script  
-    git-check : Execute git-status on all subdirectories  
-    git-init : int a github repository  
-    git-push : Push local changes to git  
-    git-status : Test repository status  
-    mdconv : Convert md file to html  
-    pdfcount :  
-    pdfmode :  
-    qninja : Ninja wrapper to use with QtCreator  
-    rpimg : Write an img file to SD Card  
-    testdd :  
-    yfname :  
 
+#### Programs
+
+* apt-upgrade
+
+    execute apt upgrade & apt full-upgrade
+
+* builddep
+
+    build dependencies
+
+* colortest
+
+    show terminal colors
+
+* cstyle
+
+* extract.sh
+
+    basic extract script
+
+* ff
+
+* git-check
+
+    execute git-status on all subdirectories
+    
+    on current dir : `git-check`
+    
+    on parent dir : `git-check ..`
+    
 * git-init
 
     `git-init home repos token`
@@ -43,14 +57,32 @@
 
     `git-push "comment"`
     
+* git-status
+
+    test repository status
+
 * mdconv
 
-    convert a md file : `mdconv file.md`  
+    convert md file to html
     
-    convert all files in current directory : `mdconv`  
+    convert one file : `mdconv file.md`
+    
+    parse current directory : `mdconv`
+
+* pdfcount
+
+* pdfmode
+
+* qninja
+    
+    ninja wrapper to use with QtCreator
 
 * rpimg
 
-    `rpimg 'my_file.img' /dev/sdc`
+    `rpimg "my_file.img" /dev/sdc`
+
+* testdd
+
+* yfname
 
 
