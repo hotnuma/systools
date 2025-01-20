@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+cssfile=$HOME/.config/style.css
+
+if [[ ! -f $cssfile ]]; then
+    exit 1
+fi
+
+cp "$cssfile" $PWD
+

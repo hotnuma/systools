@@ -23,6 +23,7 @@ systools_files = [
     'src/cstyle',
     'src/extract.sh',
     'src/ff',
+    'src/getcss',
     'src/git-check',
     'src/git-init',
     'src/git-push',

@@ -41,9 +41,14 @@
 
 * ff
 
+* getcss
+    
+    copy `$HOME/.config/style.css` in the current directory.
+    this way the same css file can be used in any markdown project.
+
 * git-check
 
-    execute git-status on all subdirectories
+    execute git-status on all subdirectories.
     
     on current dir : `git-check`
     
@@ -80,6 +85,13 @@
 * rpimg
 
     `rpimg "my_file.img" /dev/sdc`
+
+* style.css
+    
+    user css file for markdown projects,
+    it will be installed in `$HOME/.config/style.css`,
+    then the `getcss` can be used to copy the css file
+    into the current directory.
 
 * testdd
 
