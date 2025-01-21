@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 meson setup build -Dbuildtype=plain
-ninja -C build
-sudo ninja -C build install
+sudo meson install -C build
 
+cp -v src/style.css $HOME/.config/
 

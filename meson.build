@@ -7,12 +7,12 @@ project(
 
 # install css file in $HOME/.config/
 
-fs = import('fs')
-config_dir = fs.expanduser('~/.config')
-install_data(
-    ['src/style.css',],
-    install_dir : config_dir,
-)
+#~ fs = import('fs')
+#~ config_dir = fs.expanduser('~/.config')
+#~ install_data(
+#~     ['src/style.css',],
+#~     install_dir : config_dir,
+#~ )
 
 # install sys tools in /usr/local/bin/
 
