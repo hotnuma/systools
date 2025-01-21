@@ -25,6 +25,7 @@ apt_update()
 
     if [ $diff -gt $trigger ]; then
         ret=0
+        echo "sudo apt update"
         sudo apt update
     fi
 
@@ -39,22 +40,22 @@ if [[ $# > 1 ]]; then
 fi
 
 if [[ $# == 0 ]]; then
-    echo "apt upgrade..."
     apt_update
+    echo "apt upgrade"
     sudo apt upgrade
     exit 0
 fi
 
 case $1 in
     check)
-    echo "apt list --upgradable..."
     apt_update
+    echo "apt list --upgradable"
     apt list --upgradable
     exit 0
     ;;
     full)
-    echo "apt full-upgrade..."
     apt_update
+    echo "apt full-upgrade"
     sudo apt full-upgrade
     exit 0
     ;;
