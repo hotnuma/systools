@@ -24,19 +24,11 @@ td {
     padding: 15px;
 }
 
-code, pre {
-      background-color: #dbdbdb;
-   }
-   
-/*
-.txgreen {
-      background-color: #88ff75;
-   }
-
-.lidisc {
-    list-style-type: disc;
-    margin-left: 15px;
-    padding-left: 0px;
+ul, li {
+    margin-left: -5px;
 }
-*/
 
+code, pre {
+    background-color: #dbdbdb;
+}
+   
