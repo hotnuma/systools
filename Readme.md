@@ -96,5 +96,12 @@
 * testdd
 
 * yfname
+    
+    rename all youtube downloaded files in the current directory
+    in order to remove the "[xxxxxxxxxxx]" part at the end of the
+    filename.
+    
+    in current dir : `yfname`
+    in a specific directory : `yfname <directory>`
 
 
