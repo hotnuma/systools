@@ -1,38 +1,45 @@
 #!/usr/bin/env python3
 
-import sys
-import os
-import subprocess
+import os, sys, subprocess
 
 def runcmd(cmd):
     ret = subprocess.run(cmd, shell=True, capture_output=True)
     result = ret.stdout.decode()
-    return result
+    return (result, ret.returncode)
 
 def create_list(line):
     itlist = []
     parts = line.split(", ")
     for part in parts:
         it = item(part)
+        if it.skip():
+            continue
         itlist.append(it)
         cmd = "dpkg -l %s | grep ^ii" % (it.name);
-        result = runcmd(cmd)
+        result, ret = runcmd(cmd)
         if result != "":
             it.installed = True
-        
     return itlist
 
 class item:
     def __init__(self, pkgitem):
         parts = pkgitem.split(" ");
-        
         self.name = parts[0]
         self.version = ""
         self.installed = False
-        
         n = len(parts)
         if (n > 1):
             self.version = parts[1]
+    
+    def skip(self):
+        if (self.name == "debhelper-compat"
+            or self.name == "gobject-introspection"
+            or self.name == "gtk-doc-tools"
+            or self.name == "intltool"
+            or self.name == "libgirepository1.0-dev"
+            or self.name == "libtool"):
+            return True
+        return False
 
 def main():
     _list = []
@@ -43,7 +50,7 @@ def main():
         exit(1)
 
     cmd = "apt-cache showsrc %s" % args[1]
-    result = runcmd(cmd)
+    result, ret = runcmd(cmd)
     
     startkey = "Build-Depends: "
     for line in result.splitlines():
@@ -59,9 +66,10 @@ def main():
     print("")
     
     print("not installed --------------------------------------------------------\n")
+    print("sudo apt install \\")
     for it in _list:
         if not it.installed:
-            print("%s" % it.name)
+            print("%s \\" % it.name)
     print("")
     
     return 0
