@@ -1,0 +1,49 @@
+#!/usr/bin/bash
+
+# usage : build <target> file.c <lib>
+
+TARGET=""
+CFLAGS="-Wall -Wextra -O2 -D_GNU_SOURCE"
+SOURCES=""
+LIBS=""
+
+get_arg()
+{
+    arg="$1"
+    ext="${arg##*.}"
+    if [[ $arg == -* ]]; then
+        CFLAGS+=" "
+        CFLAGS+="$arg"
+    elif [[ $ext == "c" ]]; then
+        if [[ $SOURCES != "" ]]; then
+            SOURCES+=" "
+        fi
+        SOURCES+="$arg"
+    elif [[ $SOURCES == "" ]]; then
+        TARGET="$arg"
+    else
+        if [[ $LIBS != "" ]]; then
+            LIBS+=" "
+        fi
+        LIBS+="$arg"
+    fi
+}
+
+while [[ $# > 0 ]]; do
+    arg="$1"
+    case $arg in
+        *)
+        get_arg $arg
+        shift
+        ;;
+    esac
+done
+
+if [[ $LIBS != "" ]]; then
+    echo "gcc $CFLAGS -o $TARGET $SOURCES \
+    $(pkg-config --cflags --libs $LIBS)"
+else
+    echo "gcc $CFLAGS -o $TARGET $SOURCES"
+fi
+
+

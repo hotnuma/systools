@@ -10,6 +10,7 @@ project(
 systools_files = [
     'src/apt-upgrade',
     'src/builddep',
+    'src/cbuild',
     'src/colortest',
     'src/cstyle',
     'src/extract.sh',
