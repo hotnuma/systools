@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
-# usage : build <target> file.c <lib>
+# usage : cbuild <target> <file1.c file2.c>  <lib1 lib2>
+# example : cbuild test file.c gtk+-3.0
 
 TARGET=""
 CFLAGS="-Wall -Wextra -O2 -D_GNU_SOURCE"
@@ -40,10 +41,11 @@ while [[ $# > 0 ]]; do
 done
 
 if [[ $LIBS != "" ]]; then
-    echo "gcc $CFLAGS -o $TARGET $SOURCES \
-    $(pkg-config --cflags --libs $LIBS)"
+    echo "gcc $CFLAGS -o $TARGET $SOURCES $(pkg-config --cflags --libs $LIBS)"
+    gcc $CFLAGS -o $TARGET $SOURCES $(pkg-config --cflags --libs $LIBS)
 else
     echo "gcc $CFLAGS -o $TARGET $SOURCES"
+    gcc $CFLAGS -o $TARGET $SOURCES
 fi
 
 
