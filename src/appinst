@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 
 BASEDIR="$PWD"
+URL=""
+FORCE=0
 
 move_file()
 {
@@ -12,6 +14,27 @@ move_file()
     echo "cmd  : mv ${filepath} /usr/local/bin/"
     mv "$filepath" /usr/local/bin/
 }
+
+while [[ $# -gt 0 ]]; do
+    arg="$1"
+    case $arg in
+        -f)
+        FORCE=1
+        shift
+        ;;
+        *)
+        URL="$arg"
+        shift
+        ;;
+    esac
+done
+
+if [[ $URL != "http"* ]]; then
+    echo "usage : appinst \"https://url/to/program\""
+    echo "usage : appinst -f \"https://url/to/program\""
+    echo "abort..."
+    exit 1
+fi
 
 if [[ "$EUID" != 0 ]]; then
     echo "*** needs sudo"
@@ -27,17 +50,11 @@ if [[ ! -f /usr/bin/wget ]]; then
     exit 1
 fi
 
-if [[ $# != 1 ]]; then
-    echo "usage : appinst \"url_to_appimage_file\""
-    echo "abort..."
-    exit 1
-fi
-
-filename=$(basename ${1})
+filename=$(basename "$URL")
 filepath=${BASEDIR}/${filename}
 
 if [[ ! -f $filepath ]]; then
-    wget "$1"
+    wget "$URL"
 fi
 
 if [[ ! -f $filepath ]]; then
@@ -51,9 +68,10 @@ echo "file : $filepath"
 filetype=$(file -b "$filepath")
 echo "type : $filetype"
 
-if [[ $filetype != "ELF"* ]] \
+if [[ $FORCE != 1 ]] \
+&& [[ $filetype != "ELF"* ]] \
 && [[ $filetype != "Bourne-Again shell script"* ]]; then
-    echo "*** file is not an executable file"
+    echo "*** file is not an ELF file or a bash script"
     echo "abort..."
     exit 1
 fi
