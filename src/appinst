@@ -2,7 +2,7 @@
 
 basedir="$PWD"
 url=""
-destdir="$HOME"/.local/bin/
+destdir="$HOME/.local/bin/"
 force=0
 
 move_file()
@@ -53,10 +53,10 @@ if [[ ! -f /usr/bin/wget ]]; then
     exit 1
 fi
 
-filename=$(basename "$url")
-filepath=${basedir}/${filename}
+filename=${url##*/}
+filepath=$basedir/$filename
 
-test -f $filepath || wget "$url"
+test -f "$filepath" || wget "$url"
 
 if [[ ! -f $filepath ]]; then
     echo "*** download error"
