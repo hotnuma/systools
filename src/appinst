@@ -6,27 +6,23 @@ FORCE=0
 
 move_file()
 {
-    if [[ ! -f "$1" ]]; then
-        return 1
-    fi
+    test -f "$1" || return 1
     echo "cmd  : chmod +x ${filepath}"
     chmod +x "$filepath"
     echo "cmd  : mv ${filepath} /usr/local/bin/"
     mv "$filepath" /usr/local/bin/
 }
 
-while [[ $# -gt 0 ]]; do
-    arg="$1"
-    case $arg in
+while (($#)); do
+    case "$1" in
         -f)
         FORCE=1
-        shift
         ;;
         *)
-        URL="$arg"
-        shift
+        URL="$1"
         ;;
     esac
+    shift
 done
 
 if [[ $URL != "http"* ]]; then
