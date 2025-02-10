@@ -41,21 +41,23 @@ if [[ ! -f $filepath ]]; then
 fi
 
 if [[ ! -f $filepath ]]; then
-    echo "error"
+    echo "*** download error"
     echo "abort..."
     exit 1
 fi
 
 echo "file : $filepath"
 
-filetype=$(file "$filepath" | cut -d ' ' -f2)
+filetype=$(file -b "$filepath")
 echo "type : $filetype"
 
-if [[ $filetype != "ELF" ]]; then
-    echo "not an executable file"
+if [[ $filetype != "ELF"* ]] \
+&& [[ $filetype != "Bourne-Again shell script"* ]]; then
+    echo "*** file is not an executable file"
     echo "abort..."
     exit 1
 fi
 
 move_file "$filepath"
+
 
