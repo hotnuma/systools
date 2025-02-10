@@ -72,8 +72,9 @@ echo "type : $filetype"
 if [[ $force != 1 ]] \
 && [[ $filetype != "ELF"* ]] \
 && [[ $filetype != "Bourne-Again shell script"* ]] \
+&& [[ $filetype != "Perl script"* ]] \
 && [[ $filetype != "Python script"* ]] \
-&& [[ $filetype != "Perl script"* ]]; then
+&& [[ $filetype != "Ruby script"* ]]; then
     echo "*** file is not an ELF file or a bash script"
     echo "abort..."
     exit 1
