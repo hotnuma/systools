@@ -8,6 +8,7 @@ project(
 # install sys tools in /usr/local/bin/
 
 systools_files = [
+    'src/appinst',
     'src/apt-upgrade',
     'src/builddep',
     'src/cbuild',

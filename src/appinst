@@ -1,0 +1,61 @@
+#!/usr/bin/bash
+
+BASEDIR="$(dirname -- "$(readlink -f -- "$0";)")"
+
+move_file()
+{
+    if [[ ! -f "$1" ]]; then
+        return 1
+    fi
+    echo "cmd  : chmod +x ${filepath}"
+    chmod +x "$filepath"
+    echo "cmd  : mv ${filepath} /usr/local/bin/"
+    mv "$filepath" /usr/local/bin/
+}
+
+if [[ "$EUID" != 0 ]]; then
+    echo "*** needs sudo"
+    echo "abort..."
+    exit 1
+fi
+
+if [[ ! -f /usr/bin/wget ]]; then
+    echo "*** wget not found"
+    echo "install it with :"
+    echo "sudo apt install wget"
+    echo "abort..."
+    exit 1
+fi
+
+if [[ $# != 1 ]]; then
+    echo "usage : appinst \"url_to_appimage_file\""
+    echo "abort..."
+    exit 1
+fi
+
+filename=$(basename ${1})
+filepath=${BASEDIR}/${filename}
+
+if [[ ! -f $filepath ]]; then
+    wget "$1"
+fi
+
+if [[ ! -f $filepath ]]; then
+    echo "error"
+    echo "abort..."
+    exit 1
+fi
+
+echo "file : $filepath"
+
+filetype=$(file "$filepath" | cut -d ' ' -f2)
+echo "type : $filetype"
+
+if [[ $filetype != "ELF" ]]; then
+    echo "not an executable file"
+    echo "abort..."
+    exit 1
+fi
+
+move_file "$filepath"
+
