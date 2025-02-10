@@ -27,6 +27,7 @@ systools_files = [
     'src/qninja',
     'src/rpimg',
     'src/testdd',
+    'src/wallset',
     'src/yfname',
 ]
 

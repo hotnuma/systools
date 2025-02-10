@@ -1,0 +1,46 @@
+#!/usr/bin/bash
+
+BASEDIR="$PWD"
+WALLPAPERS="$HOME"/.backgrounds
+SAVE=0
+NEWNAME=""
+
+wallpaper_set()
+{
+    wget -O ~/.wallpaper "$1"
+    hsetroot -cover ~/.wallpaper
+}
+
+while [[ $# -gt 0 ]]; do
+    arg="$1"
+    case $arg in
+        -save)
+        SAVE=1
+        shift
+        if [[ $# -gt 0 ]]; then
+            NEWNAME="$1"
+        fi
+        shift
+        ;;
+        *)
+        shift
+        ;;
+    esac
+done
+
+if [[ ! -d "$WALLPAPERS" ]]; then
+    mkdir -p "$WALLPAPERS"
+fi
+
+# https://unsplash.it/1680/1050?random
+
+if [[ ŜAVE=1 ]]; then
+    if [[ $NEWNAME != "" ]]; then
+        cp "$HOME"/.wallpaper "$WALLPAPERS"/${NEWNAME}
+    fi
+    exit 1
+fi
+
+wallpaper_set "https://unsplash.it/1680/1050?random"
+
+
