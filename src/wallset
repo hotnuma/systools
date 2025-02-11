@@ -1,46 +1,49 @@
 #!/usr/bin/bash
 
-BASEDIR="$PWD"
-WALLPAPERS="$HOME"/.backgrounds
-SAVE=0
-NEWNAME=""
+wallpapers="$HOME/.backgrounds"
+current="$HOME/.wallpaper"
+save=0
+newname=""
+filepath=""
 
 wallpaper_set()
 {
-    wget -O ~/.wallpaper "$1"
-    hsetroot -cover ~/.wallpaper
+    if [[ $1 == "http"* ]]; then
+        wget -O "$current" "$1"
+        hsetroot -cover "$current"
+    elif [[ -f $1 ]]; then
+        cp "$1" "$current"
+        hsetroot -cover "$current"
+    fi
 }
 
-while [[ $# -gt 0 ]]; do
-    arg="$1"
-    case $arg in
+while (($#)); do
+    case "$1" in
         -save)
-        SAVE=1
-        shift
-        if [[ $# -gt 0 ]]; then
-            NEWNAME="$1"
-        fi
-        shift
+        save=1
+        test $# -gt 0 && shift; newname="$1"
         ;;
         *)
-        shift
+        filepath="$1"
         ;;
     esac
+    shift
 done
 
-if [[ ! -d "$WALLPAPERS" ]]; then
-    mkdir -p "$WALLPAPERS"
-fi
+test -d "$wallpapers" || mkdir -p "$wallpapers"
 
-# https://unsplash.it/1680/1050?random
-
-if [[ ŜAVE=1 ]]; then
-    if [[ $NEWNAME != "" ]]; then
-        cp "$HOME"/.wallpaper "$WALLPAPERS"/${NEWNAME}
+if [[ save == 1 ]]; then
+    if [[ $newname == "" ]]; then
+        exit 1
     fi
-    exit 1
+    cp "$HOME/.wallpaper" "$wallpapers/$newname"
+    exit 0
 fi
 
-wallpaper_set "https://unsplash.it/1680/1050?random"
+if [[ $filepath != "" ]]; then
+    wallpaper_set "$filepath"
+else
+    wallpaper_set "https://unsplash.it/1680/1050?random"
+fi
 
 
