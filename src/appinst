@@ -4,8 +4,9 @@ basedir="$PWD"
 destdir="$HOME/.local/bin/"
 url=""
 filepath=""
+opt_try=0
 # undocumented and not recommended
-force=0
+opt_force=0
 
 error_exit()
 {
@@ -19,6 +20,7 @@ error_exit()
 download_file()
 {
     local tempdir=$(mktemp -d -t appinst-XXXX)
+    echo "cmd  : wget -P \"$tempdir\" \"$1\""
     wget -P "$tempdir" "$1"
     for file in "$tempdir"/*; do
         test "$filepath" == "" || error_exit "*** multiple files error"
@@ -32,7 +34,7 @@ test_file()
 {
     filetype=$(file -b "$1")
     echo "type : $filetype"
-    if [[ $force != 1 ]] \
+    if [[ $opt_force != 1 ]] \
     && [[ $filetype != "ELF"* ]] \
     && [[ $filetype != "Bourne-Again shell script"* ]] \
     && [[ $filetype != "Perl script"* ]] \
@@ -46,18 +48,27 @@ move_file()
 {
     test -f "$1" || error_exit "invalid file"
     test -d "$2" || mkdir -p "$2"
-    echo "cmd  : chmod +x ${1}"
-    chmod +x "$1"
-    echo "cmd  : mv ${1} ${2}"
-    mv "$1" "$2"
+    if [[ $opt_try -eq 0 ]]; then
+        echo "cmd  : chmod +x ${1}"
+        chmod +x "$1"
+        echo "cmd  : mv ${1} ${2}"
+        mv "$1" "$2"
+    else
+        echo "try  : chmod +x ${1}"
+        echo "try  : mv ${1} ${2}"
+    fi
 }
 
 while (($#)); do
     case "$1" in
         -force)
-        force=1
+        opt_force=1
+        ;;
+        -try)
+        opt_try=1
         ;;
         *)
+        test "$url" == "" || error_exit "*** invalid option"
         url="$1"
         ;;
     esac
