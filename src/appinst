@@ -4,9 +4,9 @@ basedir="$PWD"
 destdir="$HOME/.local/bin/"
 url=""
 filepath=""
-opt_try=0
-# undocumented and not recommended
 opt_force=0
+opt_newname=""
+opt_try=0
 
 error_exit()
 {
@@ -30,6 +30,24 @@ download_file()
     echo "file : $filepath"
 }
 
+download_torrent()
+{
+    local tempdir=$(mktemp -d -t appinst-XXXX)
+    echo "cmd  : aria2c -d \"$tempdir\" --seed-time=0 \"$1\""
+    aria2c -d "$tempdir" --seed-time=0 "$1"
+    for file in "$tempdir"/*; do
+        if [[ $file == *".torrent" ]]; then
+            continue
+        elif [[ "$filepath" != "" ]]; then
+            error_exit "*** multiple files error"
+        elif [[ -f "$file" ]]; then
+            filepath="$file"
+        fi
+    done
+    test -f "$filepath" || error_exit "*** download error"
+    echo "file : $filepath"
+}
+
 test_file()
 {
     filetype=$(file -b "$1")
@@ -42,6 +60,12 @@ test_file()
     && [[ $filetype != "Ruby script"* ]]; then
         error_exit "*** wrong file type"
     fi
+}
+
+rename_file()
+{
+    test "$1" != "" || return
+    echo "cmd  : rename $1"
 }
 
 move_file()
@@ -62,14 +86,19 @@ move_file()
 while (($#)); do
     case "$1" in
         -force)
-        opt_force=1
+            opt_force=1
+        ;;
+        -o)
+            test $# -gt 1 || error_exit "*** missing option"
+            shift
+            opt_newname="$1"
         ;;
         -try)
-        opt_try=1
+            opt_try=1
         ;;
         *)
-        test "$url" == "" || error_exit "*** invalid option"
-        url="$1"
+            test "$url" == "" || error_exit "*** invalid option"
+            url="$1"
         ;;
     esac
     shift
@@ -88,10 +117,16 @@ if [[ "$EUID" == 0 ]]; then
 fi
 
 if [[ $url != "http"* ]]; then
-    error_exit
+    error_exit "*** wrong url"
 fi
 
-download_file "$url"
+if [[ $file == *".torrent" ]]; then
+    download_torrent "$url"
+else
+    download_file "$url"
+fi
+
+rename_file "$opt_newname"
 test_file "$filepath"
 move_file "$filepath" "$destdir"
 
