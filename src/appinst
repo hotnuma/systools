@@ -65,7 +65,10 @@ test_file()
 rename_file()
 {
     test "$1" != "" || return
-    echo "cmd  : rename $1"
+    newpath="$(dirname $filepath)/$1"
+    echo "cmd  : mv $filepath $newpath"
+    mv "$filepath" "$newpath"
+    filepath="$newpath"
 }
 
 move_file()
