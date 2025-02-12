@@ -37,10 +37,10 @@ error_exit()
 
 download_file()
 {
+    which wget 1>/dev/null || error_exit "*** wget is not installed"
     local tempdir=$(mktemp -d -t appinst-XXXX)
     echo "cmd  : wget -P \"$tempdir\" \"$1\""
-    wget -P "$tempdir" "$1"
-    test "$?" -eq 0 || error_exit "*** wget returnded an error"
+    wget -P "$tempdir" "$1" || error_exit "*** wget returnded an error"
     for file in "$tempdir"/*; do
         test "$filepath" == "" || error_exit "*** multiple files error"
         test -f "$file" && filepath="$file"
@@ -51,10 +51,10 @@ download_file()
 
 download_torrent()
 {
+    which aria2c 1>/dev/null || error_exit "*** aria2 is not installed"
     local tempdir=$(mktemp -d -t appinst-XXXX)
     echo "cmd  : aria2c -d \"$tempdir\" --seed-time=0 \"$1\""
-    aria2c -d "$tempdir" --seed-time=0 "$1"
-    test "$?" -eq 0 || error_exit "*** aria2c returnded an error"
+    aria2c -d "$tempdir" --seed-time=0 "$1" || error_exit "*** aria2c returnded an error"
     for file in "$tempdir"/*; do
         if [[ $file == *".torrent" ]]; then
             continue
@@ -127,14 +127,6 @@ while (($#)); do
     esac
     shift
 done
-
-if [[ ! -f /usr/bin/wget ]]; then
-    echo "*** wget not found"
-    echo "install it with :"
-    echo "sudo apt install wget"
-    echo "abort..."
-    exit 1
-fi
 
 if [[ "$EUID" == 0 ]]; then
     destdir="/usr/local/bin/"
