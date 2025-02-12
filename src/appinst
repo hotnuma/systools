@@ -1,33 +1,50 @@
 #!/usr/bin/bash
 
 basedir="$PWD"
-url=""
 destdir="$HOME/.local/bin/"
-force=0
+url=""
 filepath=""
+force=0
 
 error_exit()
 {
     test "$1" == "" || printf "$1"; echo "abort..."; exit 1
     echo "*** usage :"
     echo "appinst \"https://url/to/file\""
+    echo "appinst -force \"https://url/to/file\""
     echo "abort..."
     exit 1
 }
 
 download_file()
 {
-    tempdir=$(mktemp -d -t appinst-XXXX)
+    local tempdir=$(mktemp -d -t appinst-XXXX)
     wget -P "$tempdir" "$1"
     for file in "$tempdir"/*; do
         test "$filepath" == "" || error_exit "*** multiple files error"
         test -f "$file" && filepath="$file"
     done
+    test -f "$filepath" || error_exit "*** download error"
+    echo "file : $filepath"
+}
+
+test_file()
+{
+    filetype=$(file -b "$1")
+    echo "type : $filetype"
+    if [[ $force != 1 ]] \
+    && [[ $filetype != "ELF"* ]] \
+    && [[ $filetype != "Bourne-Again shell script"* ]] \
+    && [[ $filetype != "Perl script"* ]] \
+    && [[ $filetype != "Python script"* ]] \
+    && [[ $filetype != "Ruby script"* ]]; then
+        error_exit "*** wrong file type"
+    fi
 }
 
 move_file()
 {
-    test -f "$1" || return 1
+    test -f "$1" || error_exit "invalid file"
     test -d "$2" || mkdir -p "$2"
     echo "cmd  : chmod +x ${1}"
     chmod +x "$1"
@@ -60,35 +77,11 @@ if [[ "$EUID" == 0 ]]; then
 fi
 
 if [[ $url != "http"* ]]; then
-    echo "usage : appinst \"https://url/to/a_file\""
-    echo "usage : appinst -f \"https://url/to/a_file\""
-    echo "abort..."
-    exit 1
+    error_exit
 fi
 
 download_file "$url"
-
-if [[ ! -f $filepath ]]; then
-    echo "*** download error"
-    echo "abort..."
-    exit 1
-fi
-
-echo "file : $filepath"
-filetype=$(file -b "$filepath")
-echo "type : $filetype"
-
-if [[ $force != 1 ]] \
-&& [[ $filetype != "ELF"* ]] \
-&& [[ $filetype != "Bourne-Again shell script"* ]] \
-&& [[ $filetype != "Perl script"* ]] \
-&& [[ $filetype != "Python script"* ]] \
-&& [[ $filetype != "Ruby script"* ]]; then
-    echo "*** file is not an ELF file or a bash script"
-    echo "abort..."
-    exit 1
-fi
-
+test_file "$filepath"
 move_file "$filepath" "$destdir"
 
 
