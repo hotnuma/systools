@@ -4,6 +4,26 @@ basedir="$PWD"
 url=""
 destdir="$HOME/.local/bin/"
 force=0
+filepath=""
+
+error_exit()
+{
+    test "$1" == "" || printf "$1"; echo "abort..."; exit 1
+    echo "*** usage :"
+    echo "appinst \"https://url/to/file\""
+    echo "abort..."
+    exit 1
+}
+
+download_file()
+{
+    tempdir=$(mktemp -d -t appinst-XXXX)
+    wget -P "$tempdir" "$1"
+    for file in "$tempdir"/*; do
+        test "$filepath" == "" || error_exit "*** multiple files error"
+        test -f "$file" && filepath="$file"
+    done
+}
 
 move_file()
 {
@@ -17,7 +37,7 @@ move_file()
 
 while (($#)); do
     case "$1" in
-        -f)
+        -force)
         force=1
         ;;
         *)
@@ -26,6 +46,14 @@ while (($#)); do
     esac
     shift
 done
+
+if [[ ! -f /usr/bin/wget ]]; then
+    echo "*** wget not found"
+    echo "install it with :"
+    echo "sudo apt install wget"
+    echo "abort..."
+    exit 1
+fi
 
 if [[ "$EUID" == 0 ]]; then
     destdir="/usr/local/bin/"
@@ -38,25 +66,7 @@ if [[ $url != "http"* ]]; then
     exit 1
 fi
 
-if [[ $url == *"/" ]]; then
-    echo "*** url must point to a file such as :"
-    echo "\"https://url/to/a_file\""
-    echo "abort..."
-    exit 1
-fi
-
-if [[ ! -f /usr/bin/wget ]]; then
-    echo "*** wget not found"
-    echo "install it with :"
-    echo "sudo apt install wget"
-    echo "abort..."
-    exit 1
-fi
-
-filename=${url##*/}
-filepath=$basedir/$filename
-
-test -f "$filepath" || wget "$url"
+download_file "$url"
 
 if [[ ! -f $filepath ]]; then
     echo "*** download error"
@@ -65,7 +75,6 @@ if [[ ! -f $filepath ]]; then
 fi
 
 echo "file : $filepath"
-
 filetype=$(file -b "$filepath")
 echo "type : $filetype"
 
