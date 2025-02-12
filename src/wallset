@@ -14,10 +14,8 @@ wallpaper_set()
         exit 0
     fi
     
-    filepath="$wallpapers/$1"
-    test -f "$filepath" || error_exit "invalid file : $filepath"
-    
-    cp "$filepath" "$current"
+    test -f "$1" || error_exit "invalid file : $1"
+    cp "$1" "$current"
     hsetroot -cover "$current"
 }
 
@@ -26,8 +24,10 @@ error_exit()
     test "$1" == "" || echo "$1"; echo "abort..."; exit 1
     echo "*** usage :"
     echo "wallset"
-    echo "wallset \"my_file.jpg\""
-    echo "wallset -save \"my_file.jpg\""
+    echo "wallset \"/path/to/file.jpg\""
+    echo "wallset -save \"file_name\""
+    echo "wallset -set \"file_name\""
+    echo "wallset -list"
     echo "abort..."
     exit 1
 }
@@ -39,6 +39,12 @@ while (($#)); do
         -save)
             save=1
             test $# -gt 0 && shift; newname="$1"
+        ;;
+        -set)
+            test $# -gt 0 && shift; filepath="$wallpapers/$1"
+        ;;
+        -list)
+            ls -l "$wallpapers/"; exit 0
         ;;
         *)
             test "$filepath" == "" || error_exit
