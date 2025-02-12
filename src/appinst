@@ -4,14 +4,14 @@ basedir="$PWD"
 destdir="$HOME/.local/bin/"
 url=""
 filepath=""
+# undocumented and not recommended
 force=0
 
 error_exit()
 {
-    test "$1" == "" || printf "$1"; echo "abort..."; exit 1
+    test "$1" == "" || printf "$1\n"; echo "abort..."; exit 1
     echo "*** usage :"
     echo "appinst \"https://url/to/file\""
-    echo "appinst -force \"https://url/to/file\""
     echo "abort..."
     exit 1
 }
