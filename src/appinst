@@ -22,6 +22,7 @@ download_file()
     local tempdir=$(mktemp -d -t appinst-XXXX)
     echo "cmd  : wget -P \"$tempdir\" \"$1\""
     wget -P "$tempdir" "$1"
+    test "$?" -eq 0 || error_exit "*** wget returnded an error"
     for file in "$tempdir"/*; do
         test "$filepath" == "" || error_exit "*** multiple files error"
         test -f "$file" && filepath="$file"
@@ -35,6 +36,7 @@ download_torrent()
     local tempdir=$(mktemp -d -t appinst-XXXX)
     echo "cmd  : aria2c -d \"$tempdir\" --seed-time=0 \"$1\""
     aria2c -d "$tempdir" --seed-time=0 "$1"
+    test "$?" -eq 0 || error_exit "*** aria2c returnded an error"
     for file in "$tempdir"/*; do
         if [[ $file == *".torrent" ]]; then
             continue
