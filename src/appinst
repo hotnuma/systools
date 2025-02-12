@@ -136,7 +136,7 @@ if [[ $url != "http"* ]]; then
     error_exit "*** wrong url"
 fi
 
-if [[ $file == *".torrent" ]]; then
+if [[ $url == *".torrent" ]]; then
     download_torrent "$url"
 else
     download_file "$url"
