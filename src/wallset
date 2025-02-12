@@ -11,10 +11,14 @@ wallpaper_set()
     if [[ $1 == "http"* ]]; then
         wget -O "$current" "$1"
         hsetroot -cover "$current"
-    elif [[ -f $1 ]]; then
-        cp "$1" "$current"
-        hsetroot -cover "$current"
+        exit 0
     fi
+    
+    filepath="$wallpapers/$1"
+    test -f "$filepath" || usage_exit
+    
+    cp "$filepath" "$current"
+    hsetroot -cover "$current"
 }
 
 usage_exit()
