@@ -8,6 +8,24 @@ opt_force=0
 opt_newname=""
 opt_try=0
 
+ask_confirm()
+{
+    while true; do
+    read -p "$1" ret
+    case $ret in
+        [Yy]*)
+            return 0; break
+        ;;
+        [Nn]*)
+            return 1; break
+        ;;
+        *)
+            return 0; break
+        ;;
+    esac
+done
+}
+
 error_exit()
 {
     test "$1" == "" || printf "$1\n"; echo "abort..."; exit 1
@@ -78,6 +96,7 @@ move_file()
     test -f "$1" || error_exit "invalid file"
     test -d "$2" || mkdir -p "$2"
     if [[ $opt_try -eq 0 ]]; then
+        ask_confirm "install $1 ? " || error_exit "*** cancelled by user"
         echo "cmd  : chmod +x ${1}"
         chmod +x "$1"
         echo "cmd  : mv ${1} ${2}"
