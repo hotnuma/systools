@@ -40,7 +40,10 @@ make &amp;&amp; sudo make install
 <p>full upgrade : <code>apt-upgrade full</code></p></li>
 <li><p>builddep</p>
 
-<p>list build dependencies</p>
+<p>List dependencies needed to build a source package.</p>
+
+<p>The script runs <code>apt-cache showsrc</code> and reads
+the <code>Build-Depends:</code> informations.</p>
 
 <p>example : <code>builddep thunar</code></p></li>
 <li><p>colortest</p>

@@ -43,7 +43,10 @@
     
 * builddep
 
-    list build dependencies
+    List dependencies needed to build a source package.
+    
+    The script runs `apt-cache showsrc` and reads
+    the `Build-Depends:` informations.
     
     example : `builddep thunar`
 
