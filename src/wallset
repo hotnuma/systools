@@ -2,19 +2,26 @@
 
 wallpapers="$HOME/.backgrounds"
 current="$HOME/.wallpaper"
-save=0
+opt_random=0
+opt_save=0
 newname=""
 filepath=""
 
-error_exit()
+usage_exit()
 {
-    test "$1" == "" || echo "$1"; echo "abort..."; exit 1
     echo "*** usage :"
-    echo "wallset"
     echo "wallset \"/path/to/file.jpg\""
+    echo "wallset -random"
     echo "wallset -save \"file_name\""
     echo "wallset -set \"file_name\""
     echo "wallset -list"
+    echo "abort..."
+    exit 1
+}
+
+error_exit()
+{
+    printf "$1"
     echo "abort..."
     exit 1
 }
@@ -27,7 +34,7 @@ wallpaper_set()
         exit 0
     fi
     
-    test -f "$1" || error_exit "invalid file : $1"
+    test -f "$1" || error_exit "invalid file : $1\n"
     cp "$1" "$current"
     hsetroot -cover "$current"
 }
@@ -36,35 +43,47 @@ test -d "$wallpapers" || mkdir -p "$wallpapers"
 
 while (($#)); do
     case "$1" in
+        -random)
+            opt_random=1
+        ;;
         -save)
-            save=1
-            test $# -gt 0 && shift; newname="$1"
+            opt_save=1
+            test $# -gt 1 || error_exit "*** missing option\n"
+            shift
+            newname="$1"
         ;;
         -set)
-            test $# -gt 0 && shift; filepath="$wallpapers/$1"
+            test $# -gt 1 || error_exit "*** missing option\n"
+            shift
+            filepath="$wallpapers/$1"
         ;;
         -list)
             ls -l "$wallpapers/"; exit 0
         ;;
         *)
-            test "$filepath" == "" || error_exit
+            test "$filepath" == "" || usage_exit
             filepath="$1"
         ;;
     esac
     shift
 done
 
-if [[ $save == 1 ]]; then
-    test "$newname" != "" || error_exit
+if [[ $opt_save == 1 ]]; then
+    test "$newname" != "" || usage_exit
     echo "save : \"$newname\""
     cp "$HOME/.wallpaper" "$wallpapers/$newname"
     exit 0
 fi
 
-if [[ $filepath != "" ]]; then
-    wallpaper_set "$filepath"
-else
+if [[ $random == 1 ]]; then
     wallpaper_set "https://picsum.photos/1680/1050?random"
+    exit 0
 fi
+
+if [[ "$filepath" == "" ]]; then
+    usage_exit
+fi
+
+wallpaper_set "$filepath"
 
 
