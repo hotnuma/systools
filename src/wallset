@@ -75,7 +75,7 @@ if [[ $opt_save == 1 ]]; then
     exit 0
 fi
 
-if [[ $random == 1 ]]; then
+if [[ $opt_random == 1 ]]; then
     wallpaper_set "https://picsum.photos/1680/1050?random"
     exit 0
 fi
