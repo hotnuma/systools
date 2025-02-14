@@ -1,27 +1,28 @@
 #!/usr/bin/bash
 
+appname=${0##*/}
 wallpapers="$HOME/.backgrounds"
 current="$HOME/.wallpaper"
 opt_random=0
-opt_save=0
 newname=""
 filepath=""
 
 usage_exit()
 {
     echo "*** usage :"
-    echo "wallset \"/path/to/file.jpg\""
-    echo "wallset -random"
-    echo "wallset -save \"file_name\""
-    echo "wallset -set \"file_name\""
-    echo "wallset -list"
+    echo "$appname \"/path/to/file.jpg\""
+    echo "$appname -random"
+    echo "$appname -save \"file_name\""
+    echo "$appname -set \"file_name\""
+    echo "$appname -parse"
+    echo "$appname -list"
     echo "abort..."
     exit 1
 }
 
 error_exit()
 {
-    printf "$1"
+    printf "$1\n"
     echo "abort..."
     exit 1
 }
@@ -34,7 +35,7 @@ wallpaper_set()
         exit 0
     fi
     
-    test -f "$1" || error_exit "invalid file : $1\n"
+    test -f "$1" || error_exit "invalid file : $1"
     cp "$1" "$current"
     hsetroot -cover "$current"
 }
@@ -43,17 +44,20 @@ test -d "$wallpapers" || mkdir -p "$wallpapers"
 
 while (($#)); do
     case "$1" in
+        -parse)
+            viewnior "$wallpapers" &
+            exit 0
+        ;;
         -random)
             opt_random=1
         ;;
         -save)
-            opt_save=1
-            test $# -gt 1 || error_exit "*** missing option\n"
+            test $# -gt 1 || error_exit "*** missing option"
             shift
             newname="$1"
         ;;
         -set)
-            test $# -gt 1 || error_exit "*** missing option\n"
+            test $# -gt 1 || error_exit "*** missing option"
             shift
             filepath="$wallpapers/$1"
         ;;
@@ -68,8 +72,7 @@ while (($#)); do
     shift
 done
 
-if [[ $opt_save == 1 ]]; then
-    test "$newname" != "" || usage_exit
+if [[ "$newname" != "" ]]; then
     echo "save : \"$newname\""
     cp "$HOME/.wallpaper" "$wallpapers/$newname"
     exit 0
