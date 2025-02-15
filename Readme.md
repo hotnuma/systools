@@ -101,6 +101,12 @@
     
     in current directory : `mdconv`
 
+* psmem
+    
+    a memory usage script forked from https://github.com/pixelb/ps_mem
+    
+    `sudo psmem`
+
 * pdfcount
     
     pdf word count
