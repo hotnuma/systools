@@ -24,6 +24,7 @@ systools_files = [
     'src/mdconv',
     'src/pdfcount',
     'src/pdfmode',
+    'src/psmem',
     'src/qninja',
     'src/rpimg',
     'src/testdd',
