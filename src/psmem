@@ -482,6 +482,8 @@ def get_memory_usage(pids_to_show, split_args, discriminate_by_pid,
     mem_ids = {}
     count = {}
     swaps = {}
+    total_count = 0
+    
     for pid in os.listdir(proc.path('')):
         if not pid.isdigit():
             continue
@@ -524,6 +526,9 @@ def get_memory_usage(pids_to_show, split_args, discriminate_by_pid,
             count[cmd] += 1
         else:
             count[cmd] = 1
+        
+        total_count += 1
+        
         mem_ids.setdefault(cmd, {}).update({mem_id: None})
 
         # Swap (overcounting for now...)
@@ -552,7 +557,7 @@ def get_memory_usage(pids_to_show, split_args, discriminate_by_pid,
     sorted_cmds = sorted(cmds.items(), key=lambda x:x[1], reverse=True)
     sorted_cmds = [x for x in sorted_cmds if x[1]]
 
-    return sorted_cmds, shareds, count, total, swaps, total_swap
+    return sorted_cmds, shareds, count, total, swaps, total_swap, total_count
 
 def print_header(show_swap, discriminate_by_pid):
     output_string = " Private  +   Shared  =  RAM used"
@@ -566,7 +571,7 @@ def print_header(show_swap, discriminate_by_pid):
 
 
 def print_memory_usage(sorted_cmds, shareds, count, total, swaps, total_swap,
-                       show_swap):
+                       show_swap, total_count):
     for cmd in sorted_cmds:
 
         output_string = "%9s + %9s = %9s"
@@ -579,15 +584,20 @@ def print_memory_usage(sorted_cmds, shareds, count, total, swaps, total_swap,
         output_data += (cmd_with_count(cmd[0], count[cmd[0]]),)
 
         sys.stdout.write(output_string % output_data)
+        
 
     # Only show totals if appropriate
     if have_swap_pss and show_swap:  # kernel will have_pss
-        sys.stdout.write("%s\n%s%9s%s%9s\n%s\n" %
-                         ("-" * 45, " " * 24, human(total), " " * 3,
+        sys.stdout.write("%s\n" % ("-" * 45))
+        sys.stdout.write("%s%d prc\n" % (" " * 27, total_count))
+        sys.stdout.write("%s%9s%s%9s\n%s\n" %
+                         (" " * 24, human(total), " " * 3,
                           human(total_swap), "=" * 45))
     elif have_pss:
-        sys.stdout.write("%s\n%s%9s\n%s\n" %
-                         ("-" * 33, " " * 24, human(total), "=" * 33))
+        sys.stdout.write("%s\n" % ("-" * 33))
+        sys.stdout.write("%s%d prc\n" % (" " * 27, total_count))
+        sys.stdout.write("%s%9s\n%s\n" %
+                         (" " * 24, human(total), "=" * 33))
 
 
 def verify_environment(pids_to_show):
@@ -625,7 +635,7 @@ def main():
         try:
             sorted_cmds = True
             while sorted_cmds:
-                sorted_cmds, shareds, count, total, swaps, total_swap = \
+                sorted_cmds, shareds, count, total, swaps, total_swap, total_count = \
                     get_memory_usage(pids_to_show, split_args,
                                      discriminate_by_pid)
                 if only_total and show_swap and have_swap_pss:
@@ -634,7 +644,7 @@ def main():
                     sys.stdout.write(human(total, units=1)+'\n')
                 elif not only_total:
                     print_memory_usage(sorted_cmds, shareds, count, total,
-                                       swaps, total_swap, show_swap)
+                                       swaps, total_swap, show_swap, total_count)
 
                 sys.stdout.flush()
                 time.sleep(watch)
@@ -644,7 +654,7 @@ def main():
             pass
     else:
         # This is the default behavior
-        sorted_cmds, shareds, count, total, swaps, total_swap = \
+        sorted_cmds, shareds, count, total, swaps, total_swap, total_count = \
             get_memory_usage(pids_to_show, split_args,
                              discriminate_by_pid)
         if only_total and show_swap and have_swap_pss:
@@ -653,7 +663,7 @@ def main():
             sys.stdout.write(human(total, units=1)+'\n')
         elif not only_total:
             print_memory_usage(sorted_cmds, shareds, count, total, swaps,
-                               total_swap, show_swap)
+                               total_swap, show_swap, total_count)
 
     # We must close explicitly, so that any EPIPE exception
     # is handled by our excepthook, rather than the default
