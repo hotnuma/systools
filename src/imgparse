@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+
+appname=${0##*/}
+
+usage_exit()
+{
+    echo "*** usage :"
+    echo "$appname -opt1"
+    echo "$appname -opt2 bla"
+    echo "abort..."
+    exit 1
+}
+
+error_exit()
+{
+    printf "$1\n"
+    echo "abort..."
+    exit 1
+}
+
+parse_dir()
+{
+    test -d "$1" || error_exit "*** invalid directory"
+    
+    for path in $1/*; do
+        fname="${path##*/}"
+        rename_file "$1" "$fname" true
+    done
+}
+
+rename_file()
+{
+    origpath="${1}/${2}"
+    ext="${2##*.}"
+    if [[ $ext != "jpg" ]] \
+    && [[ $ext != "png" ]]; then
+        return
+    fi
+    name="${2%.*}"
+    regex='IMG-([0-9]+)-WA([0-9]+)'
+    if [[ $name =~ $regex ]]; then
+        newpath="${1}/${BASH_REMATCH[1]}-${BASH_REMATCH[2]}.${ext}"
+        echo "mv $origpath $newpath"
+        test "$3" == true && mv "$origpath" "$newpath"
+    fi
+}
+
+parse_dir "$1"
+
+

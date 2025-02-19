@@ -23,10 +23,10 @@ mdparse()
         return
     fi
 
-    for file in "$1"/*.md; do
-        #echo "*** file : $file"
-        if [[ -f "$file" ]]; then
-            mdconvert "$file"
+    for path in "$1"/*.md; do
+        #echo "*** file : $path"
+        if [[ -f "$path" ]]; then
+            mdconvert "$path"
         fi
     done
 }
