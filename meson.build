@@ -21,6 +21,7 @@ systools_files = [
     'src/git-init',
     'src/git-push',
     'src/git-status',
+    'src/imgtool',
     'src/mdconv',
     'src/pdfcount',
     'src/pdfmode',

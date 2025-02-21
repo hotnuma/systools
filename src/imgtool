@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+import os, sys, subprocess, re
+
+appname = os.path.basename(__file__)
+ffmpeg = "ffmpeg -y -hide_banner -loglevel error"
+ffprobe = "ffprobe -hide_banner"
+
+# ------------------------------------------------------------------------------
+
+def error_exit(msg):
+    if msg == "": msg = "an error occurred"
+    print("*** %s\nabort..." % msg)
+    exit(1)
+
+def usage_exit():
+    print("*** usage :")
+    print("%s \"path/to/image.png\"" % appname)
+    print("%s -auto \"path/to/image.png\"" % appname)
+    print("abort...")
+    exit(1)
+
+def runcmd(cmd):
+    ret = subprocess.run(cmd, shell=True, capture_output=True)
+    result = ret.stdout.decode()
+    return (result, ret.returncode)
+
+# ------------------------------------------------------------------------------
+
+def get_filepath(filepath):
+    filename, ext = os.path.splitext(filepath)
+    for i in range(1, 100):
+        newpath = "%s-copy%02i%s" % (filename, i, ext)
+        if not os.path.exists(newpath):
+            return newpath
+    return ""
+
+def auto_size(filepath):
+    newpath = get_filepath(filepath)
+    if newpath == "":
+        error_exit("wrong copy name")
+    auto_scale(filepath, newpath, True)
+    
+def auto_scale(filepath, newpath, yes):
+    sw, sh = get_resolution()
+    iw, ih = get_image(filepath)
+    if sw == iw and sh == ih:
+        error_exit("image already resized")
+    if sw == 0 or sh == 0 or iw == 0 or ih == 0:
+        error_exit("invalid resolution")
+    sr = sw / sh
+    ir = iw / ih
+    diff = int(sr / ir * 100)
+    if diff > 96 and diff < 104:
+        vfilter="scale=%d:%d:flags=lanczos"
+    elif sr > ir:
+        nh=iw/sr
+        vfilter="crop=%d:%d,scale=%d:%d:flags=lanczos" \
+        % (iw, round_two(nh), sw, sh)
+    elif sr < ir:
+        nw=iw*sr
+        vfilter="crop=%d:%d,scale=%d:%d:flags=lanczos" \
+        % (round_two(nw), ih, sw, sh)
+    else:
+        error_exit("diff error")
+    cmd = "%s -i \"%s\"" % (ffmpeg, filepath)
+    cmd += " -q:v 1 -vf \"%s\" \"%s\"" % (vfilter, newpath)
+    print(cmd)
+    if yes == False:
+        return
+    runcmd(cmd)
+
+def get_resolution():
+    result, ret = runcmd("xrandr")
+    if ret != 0:
+        error_exit("xrandr returned an error")
+    matchobj = re.findall(r"current\s(\d+) x (\d+)", result)
+    if not matchobj:
+        return (0, 0)
+    return (int(matchobj[0][0]), int(matchobj[0][1]))
+
+def get_image(filepath):
+    cmd = "%s \"%s\" 2>&1" % (ffprobe, filepath)
+    result, ret = runcmd(cmd)
+    if ret != 0:
+        return (0, 0)
+    matchobj = re.findall(r"(\d+)x(\d+)", result)
+    if not matchobj:
+        return (0, 0)
+    return (int(matchobj[0][0]), int(matchobj[0][1]))
+
+def round_two(val):
+    result = round(val / 2) * 2
+    if result > val:
+        return result - 2
+    return result
+
+# ------------------------------------------------------------------------------
+
+def main():
+    args = sys.argv
+    size = len(args)
+    if size < 2: usage_exit()
+
+    opt_autosize = False
+    opt_path = ""
+    i = 1
+    while i < size:
+        if args[i] == "-auto":
+            opt_autosize = True
+        else:
+            opt_path = args[i]
+        i += 1
+    
+    if not os.path.exists(opt_path):
+        error_exit("path doesn't exist")
+    
+    if opt_autosize == True:
+        auto_size(opt_path)
+        return 0
+
+    cmd = "%s \"%s\"" % (ffprobe, opt_path)
+    subprocess.run(cmd, shell=True)
+    return 0
+    
+if __name__ == "__main__":
+    main()
+
+
