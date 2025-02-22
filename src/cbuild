@@ -1,6 +1,5 @@
 #!/usr/bin/bash
 
-# usage : cbuild <target> <file1.c file2.c>  <lib1 lib2>
 # example : cbuild test file.c gtk+-3.0
 
 appname=${0##*/}
