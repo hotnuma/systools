@@ -119,6 +119,12 @@
     
     ninja wrapper to use with QtCreator
 
+* restyle
+
+    change single line c comments into cpp comments
+    
+    `restyle file.c`
+
 * rpimg
 
     copy an image file to a device
