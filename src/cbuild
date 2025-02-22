@@ -3,49 +3,56 @@
 # usage : cbuild <target> <file1.c file2.c>  <lib1 lib2>
 # example : cbuild test file.c gtk+-3.0
 
-TARGET=""
-CFLAGS="-Wall -Wextra -O2 -D_GNU_SOURCE"
-SOURCES=""
-LIBS=""
+appname=${0##*/}
+opt_target=""
+opt_cflags="-Wall -Wextra -O2 -D_GNU_SOURCE"
+opt_sources=""
+opt_libs=""
+
+usage_exit()
+{
+    echo "*** usage :"
+    echo "$appname target file1.c file2.c lib1 lib2"
+    echo "example : $appname test file.c gtk+-3.0"
+    echo "abort..."
+    exit 1
+}
 
 get_arg()
 {
     arg="$1"
     ext="${arg##*.}"
     if [[ $arg == -* ]]; then
-        CFLAGS+=" "
-        CFLAGS+="$arg"
+        test -z "$opt_cflags" || opt_cflags+=" "
+        opt_cflags+="$arg"
     elif [[ $ext == "c" ]]; then
-        if [[ $SOURCES != "" ]]; then
-            SOURCES+=" "
-        fi
-        SOURCES+="$arg"
-    elif [[ $SOURCES == "" ]]; then
-        TARGET="$arg"
+        test -z "$opt_sources" || opt_sources+=" "
+        opt_sources+="$arg"
+    elif [[ $opt_sources == "" ]]; then
+        opt_target="$arg"
     else
-        if [[ $LIBS != "" ]]; then
-            LIBS+=" "
-        fi
-        LIBS+="$arg"
+        test -z "$opt_libs" || opt_libs+=" "
+        opt_libs+="$arg"
     fi
 }
 
-while [[ $# > 0 ]]; do
-    arg="$1"
-    case $arg in
+test "$#" -gt 1 || usage_exit
+
+while (($#)); do
+    case "$1" in
         *)
-        get_arg $arg
-        shift
+        get_arg "$1"
         ;;
     esac
+    shift
 done
 
-if [[ $LIBS != "" ]]; then
-    echo "gcc $CFLAGS -o $TARGET $SOURCES $(pkg-config --cflags --libs $LIBS)"
-    gcc $CFLAGS -o $TARGET $SOURCES $(pkg-config --cflags --libs $LIBS)
+if [[ $opt_libs != "" ]]; then
+    echo "gcc $opt_cflags -o $opt_target $opt_sources $(pkg-config --cflags --libs $opt_libs)"
+    gcc $opt_cflags -o "$opt_target" $opt_sources $(pkg-config --cflags --libs $opt_libs)
 else
-    echo "gcc $CFLAGS -o $TARGET $SOURCES"
-    gcc $CFLAGS -o $TARGET $SOURCES
+    echo "gcc $opt_cflags -o $opt_target $opt_sources"
+    gcc $opt_cflags -o "$opt_target" $opt_sources
 fi
 
 
