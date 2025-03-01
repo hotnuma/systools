@@ -6,8 +6,6 @@ project(
     license : 'GPL-2.0',
 )
 
-# build c code
-
 c_args = [
     '-Wall',
     '-Wextra',
@@ -15,24 +13,45 @@ c_args = [
     '-D_GNU_SOURCE',
 ]
 
-app_deps = [
+# restyle ---------------------------------------------------------------------
+
+rest_deps = [
     dependency('gdlib'),
     dependency('tinyc'),
 ]
 
-app_sources = [
+rest_sources = [
     'src/restyle.c',
 ]
 
 executable(
     'restyle',
     c_args: c_args,
-    dependencies: app_deps,
-    sources: app_sources,
+    dependencies: rest_deps,
+    sources: rest_sources,
     install: true,
 )
 
-# install sys tools in /usr/local/bin/
+# git-history -----------------------------------------------------------------
+
+ghist_deps = [
+    dependency('tinyc'),
+    dependency('libpcre'),
+]
+
+ghist_sources = [
+    'src/git-history.c',
+]
+
+#~ executable(
+#~     'git-history',
+#~     c_args : c_args,
+#~     dependencies : ghist_deps,
+#~     sources : ghist_sources,
+#~     install : false,
+#~ )
+
+# scripts ---------------------------------------------------------------------
 
 systools_files = [
     'src/appinst',
