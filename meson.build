@@ -32,25 +32,6 @@ executable(
     install: true,
 )
 
-# git-history -----------------------------------------------------------------
-
-ghist_deps = [
-    dependency('tinyc'),
-    dependency('libpcre'),
-]
-
-ghist_sources = [
-    'src/git-history.c',
-]
-
-#~ executable(
-#~     'git-history',
-#~     c_args : c_args,
-#~     dependencies : ghist_deps,
-#~     sources : ghist_sources,
-#~     install : false,
-#~ )
-
 # scripts ---------------------------------------------------------------------
 
 systools_files = [
