@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <print.h>
 
+// cbuild git-history git-history.c tinyc
+
 #define APPNAME "git-history"
 #define REPOS "https://gitlab.xfce.org/xfce/thunar"
 
