@@ -2,6 +2,13 @@
 
 import os, sys, subprocess
 
+# -----------------------------------------------------------------------------
+
+def error_exit(msg):
+    if msg == "": msg = "an error occurred"
+    print("*** %s\nabort..." % msg)
+    exit(1)
+    
 def runcmd(cmd):
     ret = subprocess.run(cmd, shell=True, capture_output=True)
     result = ret.stdout.decode()
@@ -51,6 +58,9 @@ def main():
 
     cmd = "apt-cache showsrc %s" % args[1]
     result, ret = runcmd(cmd)
+    
+    if ret != 0:
+        error_exit("%s : returned error %d" % (cmd, ret))
     
     startkey = "Build-Depends: "
     for line in result.splitlines():

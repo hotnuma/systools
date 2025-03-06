@@ -6,7 +6,7 @@ appname = os.path.basename(__file__)
 ffmpeg = "ffmpeg -y -hide_banner -loglevel error"
 ffprobe = "ffprobe -hide_banner"
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def error_exit(msg):
     if msg == "": msg = "an error occurred"
@@ -25,7 +25,7 @@ def runcmd(cmd):
     result = ret.stdout.decode()
     return (result, ret.returncode)
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def get_filepath(filepath):
     filename, ext = os.path.splitext(filepath)
@@ -95,7 +95,7 @@ def round_two(val):
         return result - 2
     return result
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def main():
     args = sys.argv
