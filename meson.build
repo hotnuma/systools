@@ -45,6 +45,7 @@ systools_files = [
     'src/ff',
     'src/getcss',
     'src/git-check',
+    'src/git-clone',
     'src/git-init',
     'src/git-push',
     'src/git-status',

@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+
+basedir="$(dirname -- "$(readlink -f -- "$0";)")"
+appname=${0##*/}
+
+error_exit()
+{
+    msg="$1"
+    test "$msg" != "" || msg="an error occurred"
+    printf "*** $msg\nabort...\n"
+    exit 1
+}
+
+usage_exit()
+{
+    echo "*** usage :"
+    echo "$appname https://github.com/hotnuma/doclinux.git"
+    echo "abort..."
+    exit 1
+}
+
+opt_url=""
+
+while (($#)); do
+    case "$1" in
+        *)
+        opt_url="$1"
+        ;;
+    esac
+    shift
+done
+
+test "$opt_url" != "" || usage_exit
+token=$(head -n 1 /token.txt)
+url=""
+if [[ $opt_url =~ https:\/\/(.*) ]]; then
+    url="${BASH_REMATCH[1]}"
+fi
+
+test "$url" != "" || usage_exit
+
+if [[ $token != "" ]]; then
+    echo "git clone https://${token}@${url}"
+    git clone https://${token}@${url}
+else
+    echo "git clone https://${url}"
+    git clone https://${url}
+fi
+
+
