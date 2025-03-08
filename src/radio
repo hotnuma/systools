@@ -13,10 +13,16 @@ error_exit()
 
 play_file()
 {
-    test -f "$1" || error_exit "invalid file"
-    filepath=$(head -n 1 "$1")
+    local url=""
+    if [[ "$1" == "http://"* ]] || [[ "$1" == "https://"* ]]; then
+        url="$1"
+    else
+        filepath="$radios/$1"
+        test -f "$filepath" || error_exit "invalid file"
+        url=$(head -n 1 "$filepath")
+    fi
     pkill ffplay
-    ffplay -nodisp -volume 20 "$filepath" > /dev/null 2>&1 &
+    ffplay -nodisp -volume 40 "$url" > /dev/null 2>&1 &
 }
 
 test -d "$radios" || mkdir -p "$radios"
@@ -33,7 +39,7 @@ while (($#)); do
             exit 0
         ;;
         *)
-            play_file "$radios/$1"
+            play_file "$1"
             exit 0
         ;;
     esac
