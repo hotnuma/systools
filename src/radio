@@ -1,0 +1,43 @@
+#!/usr/bin/bash
+
+appname=${0##*/}
+radios="$HOME/.radios"
+
+error_exit()
+{
+    msg="$1"
+    test "$msg" != "" || msg="an error occurred"
+    printf "*** $msg\nabort...\n"
+    exit 1
+}
+
+play_file()
+{
+    test -f "$1" || error_exit "invalid file"
+    filepath=$(head -n 1 "$1")
+    pkill ffplay
+    ffplay -nodisp -volume 20 "$filepath" > /dev/null 2>&1 &
+}
+
+test -d "$radios" || mkdir -p "$radios"
+
+if [[ "$#" -eq 0 ]]; then
+    pkill ffplay
+    exit 0
+fi
+
+while (($#)); do
+    case "$1" in
+        -list)
+            ls -la "$radios"
+            exit 0
+        ;;
+        *)
+            play_file "$radios/$1"
+            exit 0
+        ;;
+    esac
+    shift
+done
+
+

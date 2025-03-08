@@ -55,6 +55,7 @@ systools_files = [
     'src/pdfmode',
     'src/psmem',
     'src/qninja',
+    'src/radio',
     'src/rpimg',
     'src/testdd',
     'src/wallset',
