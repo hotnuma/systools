@@ -11,6 +11,15 @@ error_exit()
     exit 1
 }
 
+usage_exit()
+{
+    echo "*** usage :"
+    echo "$appname -opt1"
+    echo "$appname -opt2 bla"
+    echo "abort..."
+    exit 1
+}
+
 add_file()
 {
     filepath="$radios/$1"
@@ -42,6 +51,11 @@ while (($#)); do
     case "$1" in
         -add)
             add_file "$2" "$3"
+            exit 0
+        ;;
+        -remove)
+            test "$#" -eq 2 || usage_exit
+            rm "$radios/$2"
             exit 0
         ;;
         -list)
