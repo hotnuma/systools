@@ -33,6 +33,7 @@ add_file()
 
 play_file()
 {
+    echo "play $1"
     local url=""
     if [[ -f "$1" ]]; then
         url="$1"
@@ -48,7 +49,7 @@ play_file()
 }
 
 test -d "$radios" || mkdir -p "$radios"
-test "$#" -gt 1 || usage_exit
+test "$#" -gt 0 || usage_exit
 
 while (($#)); do
     case "$1" in
