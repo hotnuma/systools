@@ -14,8 +14,13 @@ error_exit()
 usage_exit()
 {
     echo "*** usage :"
-    echo "$appname -opt1"
-    echo "$appname -opt2 bla"
+    echo "$appname -list"
+    echo "$appname -add \"name\" \"https://my/radio/stream\""
+    echo "$appname -remove \"name\""
+    echo "$appname \"name\""
+    echo "$appname \"https://my/radio/stream\""
+    echo "$appname \"path/to/file.mp3\""
+    echo "$appname -stop"
     echo "abort..."
     exit 1
 }
@@ -43,11 +48,7 @@ play_file()
 }
 
 test -d "$radios" || mkdir -p "$radios"
-
-if [[ "$#" -eq 0 ]]; then
-    pkill ffplay
-    exit 0
-fi
+test "$#" -gt 1 || usage_exit
 
 while (($#)); do
     case "$1" in
