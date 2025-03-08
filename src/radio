@@ -29,7 +29,9 @@ add_file()
 play_file()
 {
     local url=""
-    if [[ "$1" == "http://"* ]] || [[ "$1" == "https://"* ]]; then
+    if [[ -f "$1" ]]; then
+        url="$1"
+    elif [[ "$1" == "http://"* ]] || [[ "$1" == "https://"* ]]; then
         url="$1"
     else
         filepath="$radios/$1"
