@@ -1,11 +1,12 @@
 #!/usr/bin/bash
 
 appname=${0##*/}
-wallpapers="$HOME/.backgrounds"
-current="$HOME/.wallpaper"
-opt_random=0
+wallpapers="$HOME/.config/backgrounds"
+current="$HOME/.config/wallpaper"
 newname=""
 filepath=""
+opt_random=0
+opt_desktop="xfce"
 
 usage_exit()
 {
@@ -27,20 +28,35 @@ error_exit()
     exit 1
 }
 
+_set_bg()
+{
+    if [[ "$opt_desktop" == "labwc" ]]; then
+        pid="$(pidof swaybg)"
+        swaybg -i "$current" >/dev/null 2>&1 &
+        test "$pid" -gt 1 && kill "$pid"
+    else
+        hsetroot -cover "$current"
+    fi
+}
+
 wallpaper_set()
 {
     if [[ $1 == "http"* ]]; then
         wget -O "$current" "$1"
-        hsetroot -cover "$current"
+        _set_bg "$current"
         exit 0
     fi
     
     test -f "$1" || error_exit "invalid file : $1"
     cp "$1" "$current"
-    hsetroot -cover "$current"
+    _set_bg "$current"
 }
 
 test -d "$wallpapers" || mkdir -p "$wallpapers"
+
+if [[ "$XDG_CURRENT_DESKTOP" == "labwc:wlroots" ]]; then
+    opt_desktop="labwc"
+fi
 
 while (($#)); do
     case "$1" in
