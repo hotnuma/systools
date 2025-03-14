@@ -31,7 +31,7 @@ while (($#)); do
 done
 
 test "$opt_url" != "" || usage_exit
-token=$(head -n 1 /token.txt)
+token=$(head -n 1 $HOME/.config/token.txt)
 url=""
 if [[ $opt_url =~ https:\/\/(.*) ]]; then
     url="${BASH_REMATCH[1]}"
