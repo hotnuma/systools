@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 appname=${0##*/}
-wallpapers="$HOME/.config/backgrounds"
+wallpapers="$HOME/.backgrounds"
 current="$HOME/.config/wallpaper"
 newname=""
 filepath=""
