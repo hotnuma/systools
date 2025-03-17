@@ -2,6 +2,7 @@
 
 appname=${0##*/}
 radios="$HOME/.radios"
+opt_volume=30
 
 error_exit()
 {
@@ -45,7 +46,7 @@ play_file()
         url=$(head -n 1 "$filepath")
     fi
     pkill ffplay
-    ffplay -nodisp -volume 40 "$url" > /dev/null 2>&1 &
+    ffplay -nodisp -volume "$2" "$url" > /dev/null 2>&1 &
 }
 
 test -d "$radios" || mkdir -p "$radios"
@@ -71,7 +72,7 @@ while (($#)); do
             exit 0
         ;;
         *)
-            play_file "$1"
+            play_file "$1" "$opt_volume"
             exit 0
         ;;
     esac
