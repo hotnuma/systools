@@ -57,6 +57,9 @@ class Item:
             return True
         return False
 
+def get_name(item):
+    return item.name
+
 def print_deps(name, maxlen, showinst):
     cmd = "apt-cache showsrc %s" % name
     result, ret = runcmd(cmd)
@@ -121,6 +124,7 @@ def format_buffer(buffer, maxlen):
                 word = ""
             continue
         word += ch
+    wlist.sort(key = get_name)
     result = format_list(wlist, maxlen)
     print(result)
 
