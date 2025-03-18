@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+
+import os, sys, subprocess
+appname = os.path.basename(__file__)
+
+def error_exit(msg):
+    if msg == "": msg = "an error occurred"
+    print("*** %s\nabort..." % msg)
+    exit(1)
+
+def usage_exit():
+    print("*** usage :")
+    print("%s package_name" % appname)
+    print("%s package_name -max 76" % appname)
+    print("%s -i /path/to/list.txt -max 76" % appname)
+    print("abort...")
+    exit(1)
+
+def runcmd(cmd):
+    ret = subprocess.run(cmd, shell=True, capture_output=True)
+    result = ret.stdout.decode()
+    return (result, ret.returncode)
+
+def create_list(line):
+    itlist = []
+    parts = line.split(", ")
+    for part in parts:
+        item = Item(part)
+        if item.skip():
+            continue
+        itlist.append(item)
+        cmd = "dpkg -l %s | grep ^ii" % (item.name);
+        result, ret = runcmd(cmd)
+        if result != "":
+            item.installed = True
+    return itlist
+
+class Item:
+    def __init__(self, pkgitem):
+        parts = pkgitem.split(" ");
+        self.name = parts[0]
+        self.version = ""
+        self.installed = False
+        n = len(parts)
+        if (n > 1):
+            self.version = parts[1]
+    
+    def skip(self):
+        if (self.name == "debhelper-compat"
+            or self.name == "gobject-introspection"
+            or self.name == "gtk-doc-tools"
+            or self.name == "intltool"
+            or self.name == "libgirepository1.0-dev"
+            or self.name == "libtool"):
+            return True
+        return False
+
+def print_deps(name, maxlen, showinst):
+    cmd = "apt-cache showsrc %s" % name
+    result, ret = runcmd(cmd)
+    
+    if ret != 0:
+        error_exit("%s : returned error %d" % (cmd, ret))
+    
+    startkey = "Build-Depends: "
+    for line in result.splitlines():
+        if line.startswith(startkey):
+            startlen = len(startkey)
+            line = line[startlen:]
+            _list = create_list(line)
+    
+    print("\ndependencies ------"
+          "------------------------------------------------------------\n")
+    print("sudo apt install \\")
+    result = format_list(_list, maxlen)
+    print(result)
+    print("")
+    
+    if showinst == False: return
+    
+    print("\nnot installed -----"
+          "------------------------------------------------------------\n")
+    print("sudo apt install \\")
+    for it in _list:
+        if not it.installed:
+            print("%s \\" % it.name)
+    print("")
+
+def format_list(itlist, maxlen):
+    count = 0
+    result = ""
+    for item in itlist:
+        name = item.name
+        if count > 0:
+            count += 1
+            result += ' '
+        count += len(name)
+        if count > maxlen:
+            result += '\\\n'
+            count = len(name)
+        result += name
+    return result
+
+def read_file(filepath, maxlen):
+    if not os.path.exists(filepath):
+        error_exit("path does not exist")
+    with open(filepath, 'r') as file:
+        buffer = file.read()
+    wlist = []
+    word = ""
+    for ch in buffer:
+        if ch == ' ' or ch == '\\' or ch =='\n':
+            if len(word) > 0:
+                item = Item(word)
+                wlist.append(item)
+                #wlist.append(word)
+                word = ""
+            continue
+        word += ch
+    result = format_list(wlist, maxlen)
+    print(result)
+
+def main():
+    _list = []
+
+    args = sys.argv
+    size = len(args)
+    if size < 2:
+        usage_exit()
+
+    opt_name = ""
+    opt_filepath = ""
+    opt_max = 77 # -> (80 - 3)
+    i = 1
+    while i < size:
+        if args[i] == "-i":
+            i += 1
+            if i >= size: error_exit("missing param")
+            opt_filepath = args[i]
+        elif args[i] == "-max":
+            i += 1
+            if i >= size: error_exit("missing param")
+            opt_max = int(args[i]) - 3
+        else:
+            opt_name = args[i]
+        i += 1
+
+    if opt_max < 22:
+        error_exit("max must be more than 10 chars")
+    
+    if opt_filepath != "":
+        read_file(opt_filepath, opt_max)
+    else:
+        print_deps(opt_name, opt_max, False)
+
+    return 0
+
+if __name__ == "__main__":
+    main()
+
+

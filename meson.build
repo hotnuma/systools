@@ -37,8 +37,8 @@ executable(
 systools_files = [
     'src/appinst',
     'src/apt-upgrade',
-    'src/builddep',
     'src/cbuild',
+    'src/cdeps',
     'src/colortest',
     'src/cstyle',
     'src/extract.sh',
