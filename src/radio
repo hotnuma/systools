@@ -49,6 +49,15 @@ play_file()
     ffplay -nodisp -volume "$2" "$url" > /dev/null 2>&1 &
 }
 
+probe_file()
+{
+    echo "infos: $1"
+    filepath="$radios/$1"
+    test -f "$filepath" || error_exit "invalid file"
+    url=$(head -n 1 "$filepath")
+    ffprobe -hide_banner "$url"
+}
+
 test -d "$radios" || mkdir -p "$radios"
 test "$#" -gt 0 || usage_exit
 
@@ -58,13 +67,18 @@ while (($#)); do
             add_file "$2" "$3"
             exit 0
         ;;
-        -remove)
+        -infos)
             test "$#" -eq 2 || usage_exit
-            rm "$radios/$2"
+            probe_file "$2"
             exit 0
         ;;
         -list)
             ls -la "$radios"
+            exit 0
+        ;;
+        -remove)
+            test "$#" -eq 2 || usage_exit
+            rm "$radios/$2"
             exit 0
         ;;
         -stop)
