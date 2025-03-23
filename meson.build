@@ -13,10 +13,28 @@ c_args = [
     '-D_GNU_SOURCE',
 ]
 
+# git-history -----------------------------------------------------------------
+
+ghist_deps = [
+    dependency('tinyc'),
+]
+
+ghist_sources = [
+    'src/git-history.c',
+]
+
+executable(
+    'git-history',
+    c_args: c_args,
+    dependencies: ghist_deps,
+    sources: ghist_sources,
+    install: true,
+)
+
 # restyle ---------------------------------------------------------------------
 
 rest_deps = [
-    dependency('gdlib'),
+    #dependency('gdlib'),
     dependency('tinyc'),
 ]
 

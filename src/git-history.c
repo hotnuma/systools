@@ -6,13 +6,17 @@
 #include <ctype.h>
 #include <print.h>
 
-// cbuild git-history git-history.c tinyc
-
 #define APPNAME "git-history"
-#define REPOS "https://gitlab.xfce.org/xfce/thunar"
+
+typedef enum
+{
+    REP_UNKNOWN = 0,
+    REP_GITLAB,
+
+} RepType;
 
 bool get_history(const char *localdir, const char *url, const char *from);
-void get_comment(CString *result, const char *comment);
+void get_comment(CString *result, const char *comment, const char *url);
 
 static void error_exit(const char *msg)
 {
@@ -29,7 +33,7 @@ static void error_exit(const char *msg)
 static void usage_exit()
 {
     printf("*** usage :\n");
-    printf("%s param\n", APPNAME);
+    printf("%s -range \"<range>\" -url \"<url>\" local/dir\n", APPNAME);
     printf("abort...\n");
 
     exit(EXIT_FAILURE);
@@ -101,6 +105,10 @@ bool get_history(const char *localdir, const char *url, const char *range)
     print("      </tr>\n");
 
     int count = 1;
+    //RepType type = REP_UNKNOWN;
+
+    //if (strstr(url, "gitlab") != NULL)
+    //    type = REP_GITLAB;
 
     while (file_getline(&result, line))
     {
@@ -131,7 +139,7 @@ bool get_history(const char *localdir, const char *url, const char *range)
         print("        %s</a></td>", hash);
 
         print("        <td>");
-        get_comment(cmlink, comment);
+        get_comment(cmlink, comment, url);
         print("        %s", c_str(cmlink));
         print("        </td>");
 
@@ -149,7 +157,7 @@ bool get_history(const char *localdir, const char *url, const char *range)
     return true;
 }
 
-void get_comment(CString *result, const char *comment)
+void get_comment(CString *result, const char *comment, const char *url)
 {
     if (!comment || !result)
         return;
@@ -167,7 +175,7 @@ void get_comment(CString *result, const char *comment)
 
             cstr_fmt(link,
                 "<a href=\""
-                "https://gitlab.xfce.org/xfce/thunar/-/issues/%d\">", val);
+                "%s/-/issues/%d\">", url, val);
             cstr_append(result, c_str(link));
             cstr_append_c(result, '#');
             while (isdigit(*p))
@@ -191,8 +199,9 @@ int main(int argc, const char **argv)
     if (argc < 2)
         usage_exit();
 
-    const char *opt_repdir = NULL;
     const char *opt_range = NULL;
+    const char *opt_url = NULL;
+    const char *opt_repdir = NULL;
 
     int n = 1;
 
@@ -204,6 +213,13 @@ int main(int argc, const char **argv)
                 usage_exit();
 
             opt_range = argv[n];
+        }
+        else if (strcmp(argv[n], "-url") == 0)
+        {
+            if (++n >= argc)
+                usage_exit();
+
+            opt_url = argv[n];
         }
         else
         {
@@ -218,7 +234,7 @@ int main(int argc, const char **argv)
         error_exit("invalid directory");
     }
 
-    get_history(opt_repdir, REPOS, opt_range);
+    get_history(opt_repdir, opt_url, opt_range);
 
     return EXIT_SUCCESS;
 }
