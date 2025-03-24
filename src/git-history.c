@@ -11,12 +11,14 @@
 typedef enum
 {
     REP_UNKNOWN = 0,
+    REP_GITHUB,
     REP_GITLAB,
 
 } RepType;
 
 bool get_history(const char *localdir, const char *url, const char *from);
-void get_comment(CString *result, const char *comment, const char *url);
+void get_comment(CString *result, const char *comment,
+                 RepType type, const char *url);
 
 static void error_exit(const char *msg)
 {
@@ -105,10 +107,12 @@ bool get_history(const char *localdir, const char *url, const char *range)
     print("      </tr>\n");
 
     int count = 1;
-    //RepType type = REP_UNKNOWN;
+    RepType type = REP_UNKNOWN;
 
-    //if (strstr(url, "gitlab") != NULL)
-    //    type = REP_GITLAB;
+    if (strstr(url, "github") != NULL)
+        type = REP_GITHUB;
+    else if (strstr(url, "gitlab") != NULL)
+        type = REP_GITLAB;
 
     while (file_getline(&result, line))
     {
@@ -134,14 +138,34 @@ bool get_history(const char *localdir, const char *url, const char *range)
         print("        <td>%d</td>", count);
         print("        <td>%s</td>", p);
 
-        print("        <td><a href=\"%s/-/commit/%s\">", url, hash);
-        hash[8] = '\0';
-        print("        %s</a></td>", hash);
+        if (type == REP_GITHUB)
+        {
+            print("        <td><a href=\"%s/commit/%s\">", url, hash);
+            hash[8] = '\0';
+            print("        %s</a></td>", hash);
 
-        print("        <td>");
-        get_comment(cmlink, comment, url);
-        print("        %s", c_str(cmlink));
-        print("        </td>");
+            print("        <td>");
+            get_comment(cmlink, comment, type, url);
+            print("        %s", c_str(cmlink));
+            print("        </td>");
+        }
+        else if (type == REP_GITLAB)
+        {
+            print("        <td><a href=\"%s/-/commit/%s\">", url, hash);
+            hash[8] = '\0';
+            print("        %s</a></td>", hash);
+
+            print("        <td>");
+            get_comment(cmlink, comment, type, url);
+            print("        %s", c_str(cmlink));
+            print("        </td>");
+        }
+        else
+        {
+            hash[8] = '\0';
+            print("        <td>%s</td>", hash);
+            print("        <td>%s</td>", comment);
+        }
 
         print("      </tr>\n");
 
@@ -157,7 +181,8 @@ bool get_history(const char *localdir, const char *url, const char *range)
     return true;
 }
 
-void get_comment(CString *result, const char *comment, const char *url)
+void get_comment(CString *result, const char *comment,
+                 RepType type, const char *url)
 {
     if (!comment || !result)
         return;
@@ -173,9 +198,19 @@ void get_comment(CString *result, const char *comment, const char *url)
             ++p;
             int val = atoi(p);
 
-            cstr_fmt(link,
-                "<a href=\""
-                "%s/-/issues/%d\">", url, val);
+            if (type == REP_GITHUB)
+            {
+                cstr_fmt(link,
+                    "<a href=\""
+                    "%s/pull/%d\">", url, val);
+            }
+            else
+            {
+                cstr_fmt(link,
+                    "<a href=\""
+                    "%s/-/issues/%d\">", url, val);
+            }
+
             cstr_append(result, c_str(link));
             cstr_append_c(result, '#');
             while (isdigit(*p))
