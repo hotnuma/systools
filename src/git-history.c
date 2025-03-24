@@ -1,5 +1,6 @@
 #include <cprocess.h>
 #include <cfile.h>
+#include <cstringlist.h>
 #include <libpath.h>
 #include <unistd.h>
 #include <string.h>
@@ -16,7 +17,9 @@ typedef enum
 
 } RepType;
 
-bool get_history(const char *localdir, const char *url, const char *from);
+bool get_history(const char *localdir, const char *range,
+                 CStringList *filters, const char *url);
+bool filter_comment(CStringList *filters, const char *comment);
 void get_comment(CString *result, const char *comment,
                  RepType type, const char *url);
 
@@ -41,7 +44,8 @@ static void usage_exit()
     exit(EXIT_FAILURE);
 }
 
-bool get_history(const char *localdir, const char *url, const char *range)
+bool get_history(const char *localdir, const char *range,
+                 CStringList *filters, const char *url)
 {
     if (chdir(localdir) != 0)
         error_exit("chdir error");
@@ -116,9 +120,6 @@ bool get_history(const char *localdir, const char *url, const char *range)
 
     while (file_getline(&result, line))
     {
-        if (cstr_startswith(line, "I18n:", false))
-            continue;
-
         if (cstr_size(line) < 53)
             continue;
 
@@ -128,10 +129,7 @@ bool get_history(const char *localdir, const char *url, const char *range)
         p[51] = '\0';
         char *comment = p+52;
 
-        if (strncmp(comment, "I18n:", 5) == 0)
-            continue;
-
-        if (strcmp(comment, "Back to development") == 0)
+        if (filter_comment(filters, comment))
             continue;
 
         print("      <tr>");
@@ -179,6 +177,22 @@ bool get_history(const char *localdir, const char *url, const char *range)
     print("</html>");
 
     return true;
+}
+
+bool filter_comment(CStringList *filters, const char *comment)
+{
+    if (!filters)
+        return false;
+
+    int size = cstrlist_size(filters);
+
+    for (int i = 0; i < size; ++i)
+    {
+        if (strstr(comment, cstrlist_at_str(filters, i)) != 0)
+            return true;
+    }
+
+    return false;
 }
 
 void get_comment(CString *result, const char *comment,
@@ -234,9 +248,11 @@ int main(int argc, const char **argv)
     if (argc < 2)
         usage_exit();
 
-    const char *opt_range = NULL;
-    const char *opt_url = NULL;
     const char *opt_repdir = NULL;
+    const char *opt_range = NULL;
+    CStringListAuto *opt_filters = cstrlist_new_size(12);
+
+    const char *opt_url = NULL;
 
     int n = 1;
 
@@ -248,6 +264,14 @@ int main(int argc, const char **argv)
                 usage_exit();
 
             opt_range = argv[n];
+        }
+        else if (strcmp(argv[n], "-excl") == 0)
+        {
+            if (++n >= argc)
+                usage_exit();
+
+            if (strlen(argv[n]) >0)
+                cstrlist_append(opt_filters, argv[n]);
         }
         else if (strcmp(argv[n], "-url") == 0)
         {
@@ -269,7 +293,7 @@ int main(int argc, const char **argv)
         error_exit("invalid directory");
     }
 
-    get_history(opt_repdir, opt_url, opt_range);
+    get_history(opt_repdir, opt_range, opt_filters, opt_url);
 
     return EXIT_SUCCESS;
 }
