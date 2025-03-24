@@ -2,6 +2,7 @@
 #include <cfile.h>
 #include <cstringlist.h>
 #include <libpath.h>
+#include <libstr.h>
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
@@ -17,6 +18,7 @@ typedef enum
 
 } RepType;
 
+CString* get_url(const char *repdir);
 bool get_history(const char *localdir, const char *range,
                  CStringList *filters, const char *url);
 bool filter_comment(CStringList *filters, const char *comment);
@@ -243,16 +245,62 @@ void get_comment(CString *result, const char *comment,
     }
 }
 
+CString* get_url(const char *repdir)
+{
+    if (!repdir)
+        return NULL;
+
+    CStringAuto *repconf = cstr_new_size(64);
+    cstr_fmt(repconf, "%s/.git/config", repdir);
+
+    if (!file_exists(c_str(repconf)))
+        return NULL;
+
+    CStringAuto *buffer = cstr_new_size(512);
+
+    if (!file_read(buffer, c_str(repconf)))
+        return NULL;
+
+    char *ptr = c_str(buffer);
+    char *result;
+    int length;
+
+    while (str_getlineptr(&ptr, &result, &length))
+    {
+        result[length] = '\0';
+        //print(result);
+
+        char *p = strstr(result, "url = ");
+        if (!p)
+            continue;
+
+        p += 6;
+
+        if (*p == '\0')
+            return NULL;
+
+        CString *url = cstr_new(p);
+        if (cstr_endswith(url, ".git", true))
+            cstr_chop(url, 4);
+
+        //print(c_str(url));
+
+        return url;
+    }
+
+    return NULL;
+}
+
 int main(int argc, const char **argv)
 {
+    setbuf(stdout, NULL);
+
     if (argc < 2)
         usage_exit();
 
     const char *opt_repdir = NULL;
     const char *opt_range = NULL;
     CStringListAuto *opt_filters = cstrlist_new_size(12);
-
-    const char *opt_url = NULL;
 
     int n = 1;
 
@@ -273,13 +321,6 @@ int main(int argc, const char **argv)
             if (strlen(argv[n]) >0)
                 cstrlist_append(opt_filters, argv[n]);
         }
-        else if (strcmp(argv[n], "-url") == 0)
-        {
-            if (++n >= argc)
-                usage_exit();
-
-            opt_url = argv[n];
-        }
         else
         {
             opt_repdir = argv[n];
@@ -289,11 +330,16 @@ int main(int argc, const char **argv)
     }
 
     if (!dir_exists(opt_repdir))
-    {
         error_exit("invalid directory");
-    }
 
-    get_history(opt_repdir, opt_range, opt_filters, opt_url);
+    CString *url = get_url(opt_repdir);
+
+    if (!url)
+        error_exit("reading url failed");
+
+    get_history(opt_repdir, opt_range, opt_filters, c_str(url));
+
+    cstr_free(url);
 
     return EXIT_SUCCESS;
 }
