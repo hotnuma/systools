@@ -61,7 +61,7 @@ fi
 while (($#)); do
     case "$1" in
         -parse)
-            viewnior "$wallpapers" &
+            imgview "$wallpapers" &
             exit 0
         ;;
         -random)
@@ -90,7 +90,7 @@ done
 
 if [[ "$newname" != "" ]]; then
     echo "save : \"$newname\""
-    cp "$HOME/.wallpaper" "$wallpapers/$newname"
+    cp "$current" "$wallpapers/$newname"
     exit 0
 fi
 
