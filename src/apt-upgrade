@@ -5,7 +5,6 @@ show_usage()
     echo "usage :"
     echo "apt-upgrade check"
     echo "apt-upgrade"
-    echo "apt-upgrade full"
     echo "abort..."
 }
 
@@ -15,9 +14,7 @@ apt_update()
     val=0
     trigger=900
 
-    if [[ -f $dest ]];then
-        val=$(< $dest)
-    fi
+    test ! -f "$dest" || val=$(< $dest)
 
     current=$(date +%s)
     diff=$(expr $current - $val)
@@ -41,8 +38,8 @@ fi
 
 if [[ $# == 0 ]]; then
     apt_update
-    echo "apt upgrade"
-    sudo apt upgrade
+    echo "sudo apt full-upgrade"
+    sudo apt full-upgrade
     exit 0
 fi
 
@@ -51,12 +48,6 @@ case $1 in
     apt_update
     echo "apt list --upgradable"
     apt list --upgradable
-    exit 0
-    ;;
-    full)
-    apt_update
-    echo "apt full-upgrade"
-    sudo apt full-upgrade
     exit 0
     ;;
     *)
