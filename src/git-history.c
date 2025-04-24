@@ -19,8 +19,8 @@ typedef enum
 } RepType;
 
 CString* get_url(const char *repdir);
-bool get_history(const char *localdir, const char *range,
-                 CStringList *filters, const char *url);
+bool get_history(const char *localdir, const char *range, bool reverse,
+                 CStringList *filters);
 bool filter_comment(CStringList *filters, const char *comment);
 void get_comment(CString *result, const char *comment,
                  RepType type, const char *url);
@@ -46,18 +46,37 @@ static void usage_exit()
     exit(EXIT_FAILURE);
 }
 
-bool get_history(const char *localdir, const char *range,
-                 CStringList *filters, const char *url)
+bool get_history(const char *localdir, const char *range, bool reverse,
+                 CStringList *filters)
 {
+    bool ret = false;
+
+    CString *url = get_url(localdir);
+
+    if (!url)
+    {
+        printf("reading url failed\n");
+
+        return ret;
+    }
+
     if (chdir(localdir) != 0)
-        error_exit("chdir error");
+    {
+        printf("chdir error\n");
+
+        cstr_free(url);
+
+        return ret;
+    }
 
     CStringAuto *cmd = cstr_new_size(96);
     cstr_copy(cmd, "git log");
 
     cstr_append(cmd, " --date=format:'%Y-%m-%d'");
     cstr_append(cmd, " --pretty='%cd %H %s'");
-    cstr_append(cmd, " --reverse");
+
+    if (reverse)
+        cstr_append(cmd, " --reverse");
 
     if (range && *range != '\0')
     {
@@ -65,12 +84,15 @@ bool get_history(const char *localdir, const char *range,
         cstr_append(cmd, range);
     }
 
+    CStringAuto *line = cstr_new_size(1024);
+    CStringAuto *cmlink = cstr_new_size(512);
+
     CProcessAuto *process = cprocess_new();
     if (!cprocess_start(process, c_str(cmd), CP_PIPEOUT))
     {
         print("start failed");
 
-        return false;
+        goto out;
     }
 
     int status = cprocess_exitstatus(process);
@@ -79,12 +101,10 @@ bool get_history(const char *localdir, const char *range,
     {
         print("program returned : %d", status);
 
-        return false;
+        goto out;
     }
 
     const char *result = c_str(cprocess_outbuff(process));
-    CStringAuto *line = cstr_new_size(1024);
-    CStringAuto *cmlink = cstr_new_size(512);
 
     print("<html>");
     print("  <head>");
@@ -114,10 +134,11 @@ bool get_history(const char *localdir, const char *range,
 
     int count = 1;
     RepType type = REP_UNKNOWN;
+    const char *urlstr = c_str(url);
 
-    if (strstr(url, "github") != NULL)
+    if (strstr(urlstr, "github") != NULL)
         type = REP_GITHUB;
-    else if (strstr(url, "gitlab") != NULL)
+    else if (strstr(urlstr, "gitlab") != NULL)
         type = REP_GITLAB;
 
     while (file_getline(&result, line))
@@ -140,23 +161,23 @@ bool get_history(const char *localdir, const char *range,
 
         if (type == REP_GITHUB)
         {
-            print("        <td><a href=\"%s/commit/%s\">", url, hash);
+            print("        <td><a href=\"%s/commit/%s\">", urlstr, hash);
             hash[8] = '\0';
             print("        %s</a></td>", hash);
 
             print("        <td>");
-            get_comment(cmlink, comment, type, url);
+            get_comment(cmlink, comment, type, urlstr);
             print("        %s", c_str(cmlink));
             print("        </td>");
         }
         else if (type == REP_GITLAB)
         {
-            print("        <td><a href=\"%s/-/commit/%s\">", url, hash);
+            print("        <td><a href=\"%s/-/commit/%s\">", urlstr, hash);
             hash[8] = '\0';
             print("        %s</a></td>", hash);
 
             print("        <td>");
-            get_comment(cmlink, comment, type, url);
+            get_comment(cmlink, comment, type, urlstr);
             print("        %s", c_str(cmlink));
             print("        </td>");
         }
@@ -178,7 +199,12 @@ bool get_history(const char *localdir, const char *range,
     print("  </body>");
     print("</html>");
 
-    return true;
+    ret = true;
+
+out:
+    cstr_free(url);
+
+    return ret;
 }
 
 bool filter_comment(CStringList *filters, const char *comment)
@@ -300,6 +326,7 @@ int main(int argc, const char **argv)
 
     const char *opt_repdir = NULL;
     const char *opt_range = NULL;
+    bool opt_reverse = false;
     CStringListAuto *opt_filters = cstrlist_new_size(12);
 
     int n = 1;
@@ -312,6 +339,10 @@ int main(int argc, const char **argv)
                 usage_exit();
 
             opt_range = argv[n];
+        }
+        else if (strcmp(argv[n], "-reverse") == 0)
+        {
+            opt_reverse = true;
         }
         else if (strcmp(argv[n], "-excl") == 0)
         {
@@ -332,14 +363,7 @@ int main(int argc, const char **argv)
     if (!dir_exists(opt_repdir))
         error_exit("invalid directory");
 
-    CString *url = get_url(opt_repdir);
-
-    if (!url)
-        error_exit("reading url failed");
-
-    get_history(opt_repdir, opt_range, opt_filters, c_str(url));
-
-    cstr_free(url);
+    get_history(opt_repdir, opt_range, opt_reverse, opt_filters);
 
     return EXIT_SUCCESS;
 }
