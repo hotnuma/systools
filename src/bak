@@ -1,0 +1,56 @@
+#!/usr/bin/bash
+
+appname=${0##*/}
+
+error_exit()
+{
+    msg="$1"
+    test "$msg" != "" || msg="an error occurred"
+    printf "*** $msg\nabort...\n"
+    exit 1
+}
+
+usage_exit()
+{
+    echo "*** usage :"
+    echo "$appname /path/to/file"
+    echo "sudo $appname /path/to/file"
+    echo "abort..."
+    exit 1
+}
+
+test "$#" -gt 0 || error_exit "Illegal number of parameters"
+
+opt_filepath=""
+opt_unbak=0
+opt_mode="mv"
+
+while (($#)); do
+    case "$1" in
+        -u)
+            opt_unbak=1
+        ;;
+        *)
+            test "$opt_filepath" == "" || usage_exit
+            opt_filepath="$1"
+        ;;
+    esac
+    shift
+done
+
+if [[ "$opt_unbak" -eq 1 ]]; then
+    src="${opt_filepath}.bak"
+    dest="$opt_filepath"
+else
+    src="$opt_filepath"
+    dest="${opt_filepath}.bak"
+fi
+
+if [[ -f "$src" ]]; then
+    if [[ "$opt_mode" == "mv" ]] && [[ ! -f "$dest" ]]; then
+        mv "$src" "$dest"
+        exit 0
+    fi
+fi
+
+

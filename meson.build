@@ -55,6 +55,8 @@ executable(
 systools_files = [
     'src/appinst',
     'src/apt-upgrade',
+    'src/bak',
+    'src/unbak',
     'src/cbuild',
     'src/cdeps',
     'src/colortest',
