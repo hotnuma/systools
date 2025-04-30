@@ -52,9 +52,14 @@ file_backup()
     mode="$3"
     force=$4
     
-    if [[ -f "$dest" ]] && [[ $opt_force == 1 ]]; then
-        echo "rm $dest"
-        rm "$dest"
+    if [[ -f "$dest" ]]; then
+        if [[ $force == 1 ]]; then
+            echo "rm $dest"
+            rm "$dest"
+        else
+            echo "dest file exists"
+            return
+        fi
     fi
     
     if [[ "$mode" == "mv" ]]; then
@@ -81,8 +86,12 @@ if [[ -f "$src" ]]; then
     file_backup "$src" "$dest" "$opt_mode" $opt_force
 elif [[ -d "$src" ]]; then
     error_exit "backup directory unsupported"
+elif [[ -f "$dest" ]]; then
+    echo "dest file already exist"
+elif [[ -d "$dest" ]]; then
+    echo "dest directory already exist"
 else
-    exit 0
+    echo "source file doesn't exist"
 fi
 
 
