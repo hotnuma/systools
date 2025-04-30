@@ -24,11 +24,18 @@ test "$#" -gt 0 || error_exit "Illegal number of parameters"
 opt_filepath=""
 opt_unbak=0
 opt_mode="mv"
+opt_force=0
 
 while (($#)); do
     case "$1" in
         -u)
             opt_unbak=1
+        ;;
+        -f)
+            opt_force=1
+        ;;
+        -c)
+            opt_mode="cp"
         ;;
         *)
             test "$opt_filepath" == "" || usage_exit
@@ -38,19 +45,44 @@ while (($#)); do
     shift
 done
 
+file_backup()
+{
+    src="$1"
+    dest="$2"
+    mode="$3"
+    force=$4
+    
+    if [[ -f "$dest" ]] && [[ $opt_force == 1 ]]; then
+        echo "rm $dest"
+        rm "$dest"
+    fi
+    
+    if [[ "$mode" == "mv" ]]; then
+        echo "mv $src $dest"
+        mv "$src" "$dest"
+    elif [[ "$mode" == "cp" ]]; then
+        echo "cp $src $dest"
+        cp "$src" "$dest"
+    else
+        error_exit "file_backup: invalid mode"
+    fi
+}
+
 if [[ "$opt_unbak" -eq 1 ]]; then
     src="${opt_filepath}.bak"
     dest="$opt_filepath"
+    opt_mode="mv"
 else
     src="$opt_filepath"
     dest="${opt_filepath}.bak"
 fi
 
 if [[ -f "$src" ]]; then
-    if [[ "$opt_mode" == "mv" ]] && [[ ! -f "$dest" ]]; then
-        mv "$src" "$dest"
-        exit 0
-    fi
+    file_backup "$src" "$dest" "$opt_mode" $opt_force
+elif [[ -d "$src" ]]; then
+    error_exit "backup directory unsupported"
+else
+    exit 0
 fi
 
 
