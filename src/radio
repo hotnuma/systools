@@ -17,6 +17,7 @@ usage_exit()
     echo "*** usage :"
     echo "$appname -list"
     echo "$appname -add \"name\" \"https://my/radio/stream\""
+    echo "$appname -show \"name\""
     echo "$appname -remove \"name\""
     echo "$appname \"name\""
     echo "$appname \"https://my/radio/stream\""
@@ -74,6 +75,12 @@ while (($#)); do
         ;;
         -list)
             ls -la "$radios"
+            exit 0
+        ;;
+        -show)
+            test "$#" -eq 2 || usage_exit
+            cat "$radios/$2"
+            echo
             exit 0
         ;;
         -remove)
