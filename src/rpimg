@@ -31,13 +31,15 @@ outpath=$2
 
 if [[ $# != 2 ]]; then
     echo "usage:" >&2
-    echo "lsblk to find witch device and partition" >&2
-    echo "umount to unmount partitions" >&2
+    echo "extract the image if compressed" >&2
+    echo "run lsblk to find the target device" >&2
+    echo "umount all partitions" >&2
     echo "" >&2
-    echo "example:" >&2
+    echo "example on /dev/sdc :" >&2
+    echo "unxz /path/my_file.img.xz" >&2
     echo "lsblk" >&2
-    echo "sudo umount /dev/sdb1" >&2
-    echo "rpimg /path/my_file.img /dev/sdb" >&2
+    echo "umount /dev/sdc?" >&2
+    echo "rpimg /path/my_file.img /dev/sdc" >&2
     exit 1
 fi
 
