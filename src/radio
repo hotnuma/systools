@@ -30,7 +30,7 @@ usage_exit()
 add_file()
 {
     filepath="$radios/$1"
-    printf "url=\"$2\"\n" > "$filepath"
+    printf "url=$2\n" > "$filepath"
 }
 
 play_file()
