@@ -2,7 +2,7 @@
 
 appname=${0##*/}
 radios="$HOME/.radios"
-opt_volume=30
+default_volume=30
 
 error_exit()
 {
@@ -36,18 +36,40 @@ add_file()
 play_file()
 {
     echo "play $1"
-    local url=""
+    opt_url=""
+    opt_volume=$default_volume
     if [[ -f "$1" ]]; then
-        url="$1"
+        opt_url="$1"
     elif [[ "$1" == "http://"* ]] || [[ "$1" == "https://"* ]]; then
-        url="$1"
+        opt_url="$1"
     else
         filepath="$radios/$1"
         test -f "$filepath" || error_exit "invalid file"
         url=$(head -n 1 "$filepath")
+        parse_file "$filepath"
     fi
     pkill ffplay
-    ffplay -nodisp -volume "$2" "$url" > /dev/null 2>&1 &
+    ffplay -nodisp -volume "$opt_volume" "$opt_url" > /dev/null 2>&1 &
+}
+
+parse_file()
+{
+    IFS="="
+    while read -r key val; do
+        value=${val//\"/}
+        case "$key" in
+            url)
+                opt_url="$value"
+                #echo "$opt_url"
+            ;;
+            volume)
+                opt_volume="$value"
+                #echo "$opt_volume"
+            ;;
+            *)
+            ;;
+        esac
+    done < "$1"
 }
 
 probe_file()
@@ -93,7 +115,7 @@ while (($#)); do
             exit 0
         ;;
         *)
-            play_file "$1" "$opt_volume"
+            play_file "$1"
             exit 0
         ;;
     esac
