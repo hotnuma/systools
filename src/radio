@@ -74,8 +74,9 @@ probe_file()
     echo "infos: $1"
     filepath="$radios/$1"
     test -f "$filepath" || error_exit "invalid file"
-    url=$(head -n 1 "$filepath")
-    ffprobe -hide_banner "$url"
+    opt_url=""
+    parse_file "$filepath"
+    ffprobe -hide_banner "$opt_url"
 }
 
 test -d "$radios" || mkdir -p "$radios"
