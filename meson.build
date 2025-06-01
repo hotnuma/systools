@@ -73,7 +73,7 @@ systools_files = [
     'src/mdconv',
     'src/pdfcount',
     'src/pdfmode',
-    'src/psmem',
+    'src/psmem.py',
     'src/qninja',
     'src/radio',
     'src/rpimg',
