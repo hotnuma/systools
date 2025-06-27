@@ -2,7 +2,7 @@
 
 appname=${0##*/}
 radios="$HOME/.radios"
-default_volume=40
+opt_volume=50
 
 error_exit()
 {
@@ -35,9 +35,8 @@ add_file()
 
 play_file()
 {
-    echo "play $1"
+    echo "play -volume $opt_volume $1"
     opt_url=""
-    opt_volume=$default_volume
     if [[ -f "$1" ]]; then
         opt_url="$1"
     elif [[ "$1" == "http://"* ]] || [[ "$1" == "https://"* ]]; then
