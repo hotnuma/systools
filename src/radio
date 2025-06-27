@@ -108,7 +108,7 @@ while (($#)); do
             exit 0
         ;;
         -volume)
-            test "$#" -eq 2 || usage_exit
+            test "$#" -gt 1 || usage_exit
             shift
             opt_volume="$1"
         ;;
