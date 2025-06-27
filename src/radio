@@ -2,7 +2,7 @@
 
 appname=${0##*/}
 radios="$HOME/.radios"
-default_volume=30
+default_volume=40
 
 error_exit()
 {
