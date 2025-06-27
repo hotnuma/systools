@@ -96,16 +96,21 @@ while (($#)); do
             ls -la "$radios"
             exit 0
         ;;
+        -remove)
+            test "$#" -eq 2 || usage_exit
+            rm "$radios/$2"
+            exit 0
+        ;;
         -show)
             test "$#" -eq 2 || usage_exit
             cat "$radios/$2"
             echo
             exit 0
         ;;
-        -remove)
+        -volume)
             test "$#" -eq 2 || usage_exit
-            rm "$radios/$2"
-            exit 0
+            shift
+            opt_volume="$1"
         ;;
         -stop)
             pkill ffplay
