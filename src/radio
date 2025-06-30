@@ -2,7 +2,9 @@
 
 appname=${0##*/}
 radios="$HOME/.radios"
+
 opt_volume=50
+opt_af=
 
 error_exit()
 {
@@ -35,7 +37,6 @@ add_file()
 
 play_file()
 {
-    echo "play -volume $opt_volume $1"
     opt_url=""
     if [[ -f "$1" ]]; then
         opt_url="$1"
@@ -47,7 +48,13 @@ play_file()
         parse_file "$filepath"
     fi
     pkill ffplay
-    ffplay -nodisp -volume "$opt_volume" "$opt_url" > /dev/null 2>&1 &
+    if [[ $opt_af != "" ]]; then
+        echo "ffplay -nodisp -volume $opt_volume -af $opt_af $opt_url"
+        ffplay -nodisp -volume $opt_volume -af "$opt_af" $opt_url > /dev/null 2>&1 &
+    else
+        echo "ffplay -nodisp -volume $opt_volume $opt_url"
+        ffplay -nodisp -volume "$opt_volume" "$opt_url" > /dev/null 2>&1 &
+    fi
 }
 
 parse_file()
@@ -56,11 +63,14 @@ parse_file()
     while read -r key val; do
         value=${val//\"/}
         case "$key" in
-            url)
-                opt_url="$value"
+            af)
+                opt_af="$value"
             ;;
             volume)
                 opt_volume="$value"
+            ;;
+            url)
+                opt_url="$value"
             ;;
             *)
             ;;
