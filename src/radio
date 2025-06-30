@@ -49,10 +49,10 @@ play_file()
         parse_file "$filepath"
     fi
     
-    volume="volume=volume=$opt_volume/100"
     cmd="ffplay -nodisp"
+    volume="volume=volume=$opt_volume/100"
     if [[ $opt_af != "" ]]; then
-        cmd+=" -af \"$volume,$opt_af\""
+        cmd+=" -af \"$opt_af\""
     else
         cmd+=" -af \"$volume\""
     fi
