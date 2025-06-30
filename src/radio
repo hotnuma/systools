@@ -47,14 +47,17 @@ play_file()
         test -f "$filepath" || error_exit "invalid file"
         parse_file "$filepath"
     fi
-    pkill ffplay
+    cmd="ffplay -nodisp -volume $opt_volume"
     if [[ $opt_af != "" ]]; then
-        echo "ffplay -nodisp -volume $opt_volume -af $opt_af $opt_url"
-        ffplay -nodisp -volume $opt_volume -af "$opt_af" $opt_url > /dev/null 2>&1 &
-    else
-        echo "ffplay -nodisp -volume $opt_volume $opt_url"
-        ffplay -nodisp -volume "$opt_volume" "$opt_url" > /dev/null 2>&1 &
+        cmd+=" -af \"$opt_af\""
     fi
+    cmd+=" $opt_url"
+    cmd+=" > /dev/null 2>&1"
+    cmd+=" &"
+    
+    pkill ffplay
+    echo "$cmd"
+    eval "$cmd"
 }
 
 parse_file()
