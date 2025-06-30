@@ -38,6 +38,7 @@ add_file()
 play_file()
 {
     opt_url=""
+    
     if [[ -f "$1" ]]; then
         opt_url="$1"
     elif [[ "$1" == "http://"* ]] || [[ "$1" == "https://"* ]]; then
@@ -47,9 +48,13 @@ play_file()
         test -f "$filepath" || error_exit "invalid file"
         parse_file "$filepath"
     fi
-    cmd="ffplay -nodisp -volume $opt_volume"
+    
+    volume="volume=volume=$opt_volume/100"
+    cmd="ffplay -nodisp"
     if [[ $opt_af != "" ]]; then
-        cmd+=" -af \"$opt_af\""
+        cmd+=" -af \"$volume,$opt_af\""
+    else
+        cmd+=" -af \"$volume\""
     fi
     cmd+=" $opt_url"
     cmd+=" > /dev/null 2>&1"
