@@ -3,7 +3,7 @@
 appname=${0##*/}
 radios="$HOME/.radios"
 
-opt_volume=50
+opt_volume=66
 opt_af=
 
 error_exit()
