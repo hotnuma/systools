@@ -47,10 +47,10 @@ done
 
 file_backup()
 {
-    src="$1"
-    dest="$2"
-    mode="$3"
-    force=$4
+    local src="$1"
+    local dest="$2"
+    local mode="$3"
+    local force=$4
     
     if [[ -f "$dest" ]]; then
         if [[ $force == 1 ]]; then
@@ -73,7 +73,15 @@ file_backup()
     fi
 }
 
-if [[ "$opt_unbak" -eq 1 ]]; then
+filepath=${opt_filepath%/}
+filename="${filepath%.*}"
+ext="${filepath##*.}"
+
+if [[ "$ext" == "bak" ]]; then
+    src="${filename}.${ext}"
+    dest="$filename"
+    opt_mode="mv"
+elif [[ "$opt_unbak" -eq 1 ]]; then
     src="${opt_filepath}.bak"
     dest="$opt_filepath"
     opt_mode="mv"
