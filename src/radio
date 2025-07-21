@@ -32,7 +32,9 @@ usage_exit()
 add_file()
 {
     filepath="$radios/$1"
-    printf "url=$2\n" > "$filepath"
+    printf "#volume=100\n" > "$filepath"
+    printf "#af=acompressor=threshold=-12dB:ratio=2:knee=2.82:attack=6:release=60\n" >> "$filepath"
+    printf "url=$2\n" >> "$filepath"
 }
 
 play_file()
