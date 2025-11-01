@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+
+import os, sys, time, subprocess
+appname = os.path.basename(__file__)
+
+def error_exit(msg):
+    if msg == "": msg = "an error occurred"
+    print("*** %s\nabort..." % msg)
+    exit(1)
+
+def usage_exit():
+    print("*** usage :")
+    print("%s /path/to/file.txt" % appname)
+    print("abort...")
+    exit(1)
+
+def runcmd(cmd):
+    ret = subprocess.run(cmd, shell=True, capture_output=True)
+    result = ret.stdout.decode()
+    return (result, ret.returncode)
+
+def sum_get(filepath):
+    cmd = "md5sum \"%s\"" % filepath
+    result = runcmd(cmd)
+    if result[1] != 0:
+        return ""
+    chsum = result[0][:32]
+    return chsum
+
+def sum_init(inpath, outpath):
+    if os.path.exists(outpath):
+        return
+    result=""
+    with open(inpath, "rb") as fin:
+        for line in fin:
+            line = line.strip().decode("UTF-8")
+            result += "\t\t"
+            result += line
+            result += "\n"
+    fout = open(outpath, "wb")
+    fout.write(bytes(result, "UTF-8"))
+    fout.close()
+
+def sum_create(directory, inpath, compare, timeout):
+    result=""
+    abort=False
+    with open(inpath, "rb") as fin:
+        for line in fin:
+            line = line.rstrip().decode("UTF-8")
+            parts = line.split("\t")
+            if len(parts) != 3:
+                print("invalid   : %s" % line)
+                result += line
+                result += "\n"
+                continue
+            chsum = parts[0]
+            ret = parts[1]
+            filepath = parts[2]
+            fullpath = os.path.join(directory, filepath)
+            if not os.path.isfile(fullpath):
+                print("not found : %s" % filepath)
+                result += line
+                result += "\n"
+                continue
+            if abort == True:
+                result += line
+                result += "\n"
+                continue
+            if int(time.time()) > timeout:
+                abort = True
+                result += line
+                result += "\n"
+                continue
+            if compare == False:
+                if chsum != '':
+                    result += line
+                    result += "\n"
+                    continue
+                val = sum_get(fullpath)
+                if len(val) != 32:
+                    print("sum error : %s" % filepath)
+                    result += line
+                    result += "\n"
+                    continue
+                chsum = val
+            else:
+                if len(chsum) != 32 or ret != '':
+                    result += line
+                    result += "\n"
+                    continue
+                val = sum_get(fullpath)
+                if len(val) != 32:
+                    print("sum error : %s" % filepath)
+                    result += line
+                    result += "\n"
+                    continue
+                if val == chsum:
+                    ret = "ok"
+                else:
+                    print("failed    : %s" % filepath)
+                    ret = "failed"
+            result += chsum
+            result += "\t"
+            result += ret
+            result += "\t"
+            result += filepath
+            result += "\n"
+    fin.close()
+    fout = open(inpath, "wb")
+    fout.write(bytes(result, "UTF-8"))
+    fout.close()
+                
+args = sys.argv
+size = len(args)
+if size < 2: usage_exit()
+
+timemax = 20
+opt_infile = ""
+opt_dir = ""
+opt_cmp = False
+
+i = 1
+while i < size:
+    if args[i] == "-orig":
+        i += 1
+        if i >= size: error_exit("missing param")
+        opt_dir = args[i]
+    elif args[i] == "-back":
+        i += 1
+        if i >= size: error_exit("missing param")
+        opt_dir = args[i]
+        opt_cmp = True
+    else:
+        opt_infile = args[i]
+    i += 1
+
+timeout = int(time.time()) + (timemax * 60)
+filepath = opt_infile + ".sum"
+
+sum_init(opt_infile, filepath)
+sum_create(opt_dir, filepath, opt_cmp, timeout)
+
+

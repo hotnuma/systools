@@ -62,6 +62,7 @@ systools_files = [
     'src/colortest',
     'src/cstyle',
     'src/extract.sh',
+    'src/fcheck',
     'src/ff',
     'src/getcss',
     'src/git-check',
