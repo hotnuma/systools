@@ -20,16 +20,22 @@ def runcmd(cmd):
     result = ret.stdout.decode()
     return (result, ret.returncode)
 
-args = sys.argv
-size = len(args)
-
-def israspi(pakname):
+def israspi(pakname, repository):
     cmd = "apt-cache policy %s" % pakname
     result = runcmd(cmd)
     output = result[0]
-    if "archive.raspberrypi.com" in output:
-        print(pakname)
-    
+    keep = False
+    for line in output.splitlines():
+        if line.startswith(" *** "):
+            keep = True
+        elif line.startswith("        "):
+            if keep == True and repository in line:
+                print(pakname)
+                return
+        elif line.startswith("     "):
+            keep = False
+
+repository = "archive.raspberrypi.com"
 cmd = "dpkg -l"
 result = runcmd(cmd)
 output = result[0]
@@ -41,5 +47,5 @@ for line in output.splitlines():
     if parts[0] != "ii":
         continue
     pakname = parts[1].split(":")[0]
-    israspi(pakname)
+    israspi(pakname, repository)
 
