@@ -19,11 +19,11 @@ usage_exit()
     exit 1
 }
 
-test "$#" -gt 0 || error_exit "Illegal number of parameters"
+test "$#" -gt 0 || usage_exit
 
 opt_filepath=""
 opt_unbak=0
-opt_mode="mv"
+opt_mode="cp"
 opt_force=0
 
 while (($#)); do
@@ -31,11 +31,11 @@ while (($#)); do
         -u)
             opt_unbak=1
         ;;
+        -m)
+            opt_mode="mv"
+        ;;
         -f)
             opt_force=1
-        ;;
-        -c)
-            opt_mode="cp"
         ;;
         *)
             test "$opt_filepath" == "" || usage_exit
@@ -52,54 +52,49 @@ file_backup()
     local mode="$3"
     local force=$4
     
-    if [[ -f "$dest" ]]; then
+    if [[ ! -f "$src" ]] && [[ ! -d "$src" ]]; then
+        error_exit "$src doesn't exist"
+    fi
+    
+    if [[ -f "$dest" ]] || [[ -d "$dest" ]]; then
         if [[ $force == 1 ]]; then
-            echo "rm $dest"
-            rm "$dest"
+            echo "rm -rf $dest"
+            rm -rf "$dest"
         else
             echo "dest file exists"
             return
         fi
     fi
     
-    if [[ "$mode" == "mv" ]]; then
+    if [[ "$mode" == "cp" ]]; then
+        echo "cp $src $dest"
+        cp -r "$src" "$dest"
+    elif [[ "$mode" == "mv" ]]; then
         echo "mv $src $dest"
         mv "$src" "$dest"
-    elif [[ "$mode" == "cp" ]]; then
-        echo "cp $src $dest"
-        cp "$src" "$dest"
     else
         error_exit "file_backup: invalid mode"
     fi
 }
 
-filepath=${opt_filepath%/}
+filepath=$(echo "$opt_filepath" | sed 's:/*$::')
 filename="${filepath%.*}"
 ext="${filepath##*.}"
 
 if [[ "$ext" == "bak" ]]; then
-    src="${filename}.${ext}"
+    src="${filename}.bak"
     dest="$filename"
     opt_mode="mv"
 elif [[ "$opt_unbak" -eq 1 ]]; then
-    src="${opt_filepath}.bak"
-    dest="$opt_filepath"
+    src="${filename}.bak"
+    dest="$filename"
     opt_mode="mv"
 else
-    src="$opt_filepath"
-    dest="${opt_filepath}.bak"
+    src="$filepath"
+    dest="${filepath}.bak"
 fi
 
-if [[ -f "$src" ]]; then
-    file_backup "$src" "$dest" "$opt_mode" $opt_force
-elif [[ -d "$src" ]]; then
-    error_exit "backup directory unsupported"
-elif [[ -f "$dest" ]]; then
-    echo "dest file already exist"
-elif [[ -d "$dest" ]]; then
-    echo "dest directory already exist"
-else
-    echo "source file doesn't exist"
-fi
+#echo "$src $dest $opt_mode $opt_force"
+file_backup "$src" "$dest" "$opt_mode" $opt_force
 
 
