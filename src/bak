@@ -19,6 +19,26 @@ usage_exit()
     exit 1
 }
 
+confirm()
+{
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [Y/n]} " response
+    case "$response" in
+        [yY][eE][sS]|[yY]|"") 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+abort()
+{
+    echo "${1:-abort}"
+    exit 1
+}
+
 test "$#" -gt 0 || usage_exit
 
 opt_filepath=""
@@ -61,8 +81,9 @@ file_backup()
             echo "rm -rf $dest"
             rm -rf "$dest"
         else
-            echo "dest file exists"
-            return
+            confirm "delete $dest ? [Y/n]" || abort
+            echo "rm -rf $dest"
+            rm -rf "$dest"
         fi
     fi
     
