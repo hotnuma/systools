@@ -72,6 +72,7 @@ systools_files = [
     'src/git-status',
     'src/imgtool',
     'src/mdconv',
+    'src/paklist',
     'src/pdfcount',
     'src/pdfmode',
     'src/psmem.py',
