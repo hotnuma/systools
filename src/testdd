@@ -1,21 +1,30 @@
 #!/usr/bin/bash
 
-if [[ $# != 1 ]]; then
-    echo "usage:" >&2
-    echo "testdd /tmp/outfile.img" >&2
+usage_exit()
+{
+    echo "*** usage :"
+    echo "rm ./outfile"
+    echo "testdd ./outfile"
+    echo "abort..."
     exit 1
+}
+
+if [[ $# != 1 ]]; then
+    usage_exit
 fi
 
 outpath=$1
 
 # write
-dd if=/dev/zero of="$outpath" bs=1G count=1 oflag=dsync
+echo "*** write test"
+dd if=/dev/zero of="$outpath" bs=500M count=1 oflag=dsync
 
 # read
+echo "*** read test"
 echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
 dd if="$outpath" of=/dev/null bs=8k
 
 # cached
+echo "*** cached read test"
 dd if="$outpath" of=/dev/null bs=8k
-
 
