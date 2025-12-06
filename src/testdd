@@ -15,6 +15,9 @@ fi
 
 outpath=$1
 
+# delete
+test -f "$outpath" && rm "$outpath"
+
 # write
 echo "*** write test"
 dd if=/dev/zero of="$outpath" bs=500M count=1 oflag=dsync
@@ -28,3 +31,5 @@ dd if="$outpath" of=/dev/null bs=8k
 echo "*** cached read test"
 dd if="$outpath" of=/dev/null bs=8k
 
+# delete
+test -f "$outpath" && rm "$outpath"
