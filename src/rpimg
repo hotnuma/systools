@@ -1,6 +1,23 @@
 #!/usr/bin/bash
 
-# -----------------------------------------------------------------------------
+appname=${0##*/}
+
+usage_exit()
+{
+    echo "*** usage:" >&2
+    echo "$appname -opt2 bla" >&2
+    echo "extract the image if compressed" >&2
+    echo "run lsblk to find the target device" >&2
+    echo "umount all partitions" >&2
+    echo "" >&2
+    echo "example on /dev/sdc :" >&2
+    echo "unxz /path/my_file.img.xz" >&2
+    echo "lsblk" >&2
+    echo "umount /dev/sdc?" >&2
+    echo "$appname /path/my_file.img /dev/sdc" >&2
+    echo "abort..." >&2
+    exit 1
+}
 
 confirm()
 {
@@ -22,34 +39,46 @@ abort()
     exit 1
 }
 
-# -----------------------------------------------------------------------------
-
-basedir="$(dirname "$0")"
-
-inpath=$1
-outpath=$2
+inpath=""
+outpath=""
+opt_clear=0
 
 if [[ $# != 2 ]]; then
-    echo "usage:" >&2
-    echo "extract the image if compressed" >&2
-    echo "run lsblk to find the target device" >&2
-    echo "umount all partitions" >&2
-    echo "" >&2
-    echo "example on /dev/sdc :" >&2
-    echo "unxz /path/my_file.img.xz" >&2
-    echo "lsblk" >&2
-    echo "umount /dev/sdc?" >&2
-    echo "rpimg /path/my_file.img /dev/sdc" >&2
-    exit 1
+    usage_exit
+fi
+
+while (($#)); do
+    case "$1" in
+        -clear)
+            opt_clear=1
+            outpath="$2"
+            break
+        ;;
+        *)
+            inpath="$1"
+            outpath="$2"
+            break
+        ;;
+    esac
+    shift
+done
+
+# clear partition table
+if [[ $opt_clear -eq 1 ]]; then
+    echo "sudo dd if=/dev/zero of=$outpath bs=512 count=1 conv=notrunc"
+    confirm || abort
+    sudo dd if=/dev/zero of="$outpath" bs=512 count=1 conv=notrunc
+    sync
+    exit 0
 fi
 
 if [[ ! -f $inpath ]]; then
-    echo "input file error"
+    echo "input file doesn't exist" >&2
     exit 1
 fi
 
-echo sudo dd if=$inpath of=$outpath bs=4M conv=fsync status=progress
-
+# write image to device
+echo "sudo dd if=$inpath of=$outpath bs=4M conv=fsync status=progress"
 confirm || abort
 
 sudo dd if="$inpath" of="$outpath" bs=4M conv=fsync status=progress
