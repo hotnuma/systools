@@ -52,6 +52,8 @@ echo sudo dd if=$inpath of=$outpath bs=4M conv=fsync status=progress
 
 confirm || abort
 
+sudo dd if=/dev/zero of="$outpath" bs=512 count=1 conv=notrunc
+sync
 sudo dd if="$inpath" of="$outpath" bs=4M conv=fsync status=progress
-
+sync
 
