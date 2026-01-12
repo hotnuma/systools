@@ -77,7 +77,6 @@ systools_files = [
     'src/pdfmode',
     'src/psmem.py',
     'src/qninja',
-    'src/radio',
     'src/rpimg',
     'src/testdd',
     'src/wallset',
