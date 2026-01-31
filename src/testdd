@@ -3,7 +3,6 @@
 usage_exit()
 {
     echo "*** usage :"
-    echo "rm ./outfile"
     echo "testdd ./outfile"
     echo "abort..."
     exit 1
@@ -20,7 +19,7 @@ test -f "$outpath" && rm "$outpath"
 
 # write
 echo "*** write test"
-dd if=/dev/zero of="$outpath" bs=500M count=1 oflag=dsync
+dd if=/dev/zero of="$outpath" bs=1000M count=1 oflag=dsync
 
 # read
 echo "*** read test"
