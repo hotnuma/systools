@@ -30,6 +30,18 @@ static void _lcm_get_path(CString *result)
     cstr_append(result, "/.config/lcm.conf");
 }
 
+static void _read_key(CIniSection *section, const char *key, double *result)
+{
+    CStringAuto *temp = cstr_new_size(12);
+    
+    if (!cinisection_key_value(section, temp, key, ""))
+        return;
+    
+    double value = strtod(c_str(temp), NULL);
+    if (value > 0)
+        *result = value;
+}
+
 static bool lcm_read(Lcm *lcm)
 {
     CStringAuto *inipath = cstr_new_size(64);
@@ -44,22 +56,14 @@ static bool lcm_read(Lcm *lcm)
     if (!section)
         return false;
 
-    CStringAuto *temp = cstr_new_size(12);
-    double value;
+    _read_key(section, "C1", &(lcm->C1));
+    _read_key(section, "L1", &(lcm->L1));
     
-    if (!cinisection_key_value(section, temp, "C1", ""))
-        return false;
-    value = strtod(c_str(temp), NULL);
-    if (value == 0)
-        return false;
-    lcm->C1 = value;
-
-    if (!cinisection_key_value(section, temp, "L1", ""))
-        return false;
-    value = strtod(c_str(temp), NULL);
-    if (value == 0)
-        return false;
-    lcm->L1 = value;
+    // add bridge resistors
+    //~ _read_key(section, "C1", &(lcm->C1));
+    //~ _read_key(section, "C1", &(lcm->C1));
+    //~ _read_key(section, "C1", &(lcm->C1));
+    //~ _read_key(section, "C1", &(lcm->C1));
 
     return true;
 }
