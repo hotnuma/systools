@@ -94,16 +94,16 @@ static void print_result(char *fname, double result)
 
 int lcm_cal(Lcm *lcm, int argc, char **argv)
 {
-    if (argc != 4)
-        usage_exit();
+    // f1 f2 Cref
     
-    // external reference capacitor
-    double Cref = 9.066e-9;
+    if (argc != 5)
+        usage_exit();
     
     double f1 = strtod(argv[2], NULL);
     double f2 = strtod(argv[3], NULL);
     double f1_2 = pow(f1, 2);
     double f2_2 = pow(f2, 2);
+    double Cref = strtod(argv[4], NULL);
     
     lcm->C1 = Cref*f2_2/(f1_2-f2_2);
     lcm->L1 = 1/(4*pow(M_PI, 2)*f1_2*lcm->C1);
