@@ -15,9 +15,10 @@ typedef struct _Lcm
 static void usage_exit()
 {
     printf("*** usage :\n");
-    printf("Calibration : %s cal f1 f2\n", APPNAME);
+    printf("Calibration : %s cal f1 f2 cref\n", APPNAME);
     printf("C           : %s c f1 f2\n", APPNAME);
     printf("L           : %s l f1 f2\n", APPNAME);
+    printf("RC          : %s rc R C\n", APPNAME);
     printf("abort...\n");
 
     exit(EXIT_FAILURE);
@@ -141,6 +142,22 @@ int lcm_l(Lcm *lcm, int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
+int lcm_rc(Lcm *lcm, int argc, char **argv)
+{
+    (void) lcm;
+    
+    if (argc != 4)
+        usage_exit();
+    
+    double R = strtod(argv[2], NULL);
+    double C = strtod(argv[3], NULL);
+    double result = 1/(2*M_PI*R*C);
+    
+    print_result(argv[1], result);
+
+    return EXIT_SUCCESS;
+}
+
 int main(int argc, char **argv)
 {
     Lcm lcm;
@@ -160,6 +177,9 @@ int main(int argc, char **argv)
     
     if (strcmp(argv[1], "l") == 0)
         return lcm_l(&lcm, argc, argv);
+    
+    if (strcmp(argv[1], "rc") == 0)
+        return lcm_rc(&lcm, argc, argv);
     
     return EXIT_FAILURE;
 }
