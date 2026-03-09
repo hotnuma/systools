@@ -22,7 +22,7 @@ static void _config_get_path(CString *result)
     cstr_append(result, "/.config/lcm.conf");
 }
 
-static bool config_read(double *result)
+static bool config_read(double *C1, double *L1)
 {
     CStringAuto *inipath = cstr_new_size(64);
     _config_get_path(inipath);
@@ -37,19 +37,26 @@ static bool config_read(double *result)
         return false;
 
     CStringAuto *temp = cstr_new_size(12);
-    if (!cinisection_key_value(section, temp, "cal", ""))
-        return false;
-
-    double val = strtod(c_str(temp), NULL);
-    if (val == 0)
-        return false;
+    double value;
     
-    *result = val;
+    if (!cinisection_key_value(section, temp, "C1", ""))
+        return false;
+    value = strtod(c_str(temp), NULL);
+    if (value == 0)
+        return false;
+    *C1 = value;
+
+    if (!cinisection_key_value(section, temp, "L1", ""))
+        return false;
+    value = strtod(c_str(temp), NULL);
+    if (value == 0)
+        return false;
+    *L1 = value;
 
     return true;
 }
 
-static bool config_save(double value)
+static bool config_save(double C1, double L1)
 {
     CStringAuto *inipath = cstr_new_size(64);
     _config_get_path(inipath);
@@ -61,7 +68,9 @@ static bool config_save(double value)
 
     CStringAuto *temp = cstr_new_size(32);
     cfile_write(file, "[LCM]\n");
-    cstr_fmt(temp, "cal=%ld\n", value);
+    cstr_fmt(temp, "C1=%ld\n", C1);
+    cfile_write(file, c_str(temp));
+    cstr_fmt(temp, "L1=%ld\n", L1);
     cfile_write(file, c_str(temp));
     cfile_write(file, "\n");
 
@@ -81,15 +90,20 @@ int func_cal(int argc, char **argv)
     if (argc != 4)
         usage_exit();
     
+    // external reference capacitor
     double Cref = 9.066e-9;
+    
     double f1 = strtod(argv[2], NULL);
     double f2 = strtod(argv[3], NULL);
-    double temp = pow(f2, 2);
-    double result = Cref*temp/(pow(f1, 2)-temp);
+    double f1_2 = pow(f1, 2);
+    double f2_2 = pow(f2, 2);
+    double C1 = Cref*f2_2/(f1_2-f2_2);
+    double L1 = 1/(4*pow(M_PI, 2)*f1_2*C1);
 
-    print_result(argv[1], result);
+    print_result("C1", C1);
+    print_result("L1", L1);
     
-    config_save(result);
+    config_save(C1, L1);
     
     return EXIT_SUCCESS;
 }
@@ -122,8 +136,9 @@ int func_l(int argc, char **argv, double C1)
 int main(int argc, char **argv)
 {
     double C1 = 1.076879e-09;
+    double L1 = 100e-6;
     
-    config_read(&C1);
+    config_read(&C1, &L1);
 
     if (argc < 2)
         usage_exit();
