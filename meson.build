@@ -31,6 +31,24 @@ executable(
     install: true,
 )
 
+# lcm -------------------------------------------------------------------------
+
+lcm_deps = [
+    dependency('tinyc'),
+]
+
+lcm_sources = [
+    'src/lcm.c',
+]
+
+executable(
+    'lcm',
+    c_args: c_args,
+    dependencies: lcm_deps,
+    sources: lcm_sources,
+    install: true,
+)
+
 # restyle ---------------------------------------------------------------------
 
 rest_deps = [
