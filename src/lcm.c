@@ -162,6 +162,27 @@ int lcm_rc(Lcm *lcm, int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
+int lcm_ip(Lcm *lcm, int argc, char **argv)
+{
+    (void) lcm;
+    
+    if (argc != 4)
+        usage_exit();
+    
+    double v1 = strtod(argv[2], NULL);
+    double v2 = strtod(argv[3], NULL);
+    
+    if (v1 == 0)
+        return EXIT_FAILURE;
+    
+    double r = v2 / v1;
+    double result = (r - 1.0) * 100.0;
+    
+    print_result(argv[1], result);
+
+    return EXIT_SUCCESS;
+}
+
 int main(int argc, char **argv)
 {
     Lcm lcm;
@@ -184,6 +205,9 @@ int main(int argc, char **argv)
     
     if (strcmp(argv[1], "rc") == 0)
         return lcm_rc(&lcm, argc, argv);
+    
+    if (strcmp(argv[1], "ip") == 0)
+        return lcm_ip(&lcm, argc, argv);
     
     return EXIT_FAILURE;
 }
