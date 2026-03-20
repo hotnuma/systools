@@ -80,9 +80,9 @@ static bool lcm_save(Lcm *lcm)
 
     CStringAuto *temp = cstr_new_size(32);
     cfile_write(file, "[LCM]\n");
-    cstr_fmt(temp, "C1=%ld\n", lcm->C1);
+    cstr_fmt(temp, "C1=%.6e\n", lcm->C1);
     cfile_write(file, c_str(temp));
-    cstr_fmt(temp, "L1=%ld\n", lcm->L1);
+    cstr_fmt(temp, "L1=%.6e\n", lcm->L1);
     cfile_write(file, c_str(temp));
     cfile_write(file, "\n");
 
@@ -137,12 +137,15 @@ int lcm_c(Lcm *lcm, int argc, char **argv)
 
 int lcm_l(Lcm *lcm, int argc, char **argv)
 {
-    (void) lcm;
-    (void) argv;
-    
     if (argc != 4)
         usage_exit();
     
+    double f1 = strtod(argv[2], NULL);
+    double f3 = strtod(argv[3], NULL);
+    double result = lcm->L1*((pow(f1, 2)/pow(f3, 2)) - 1);
+    
+    print_result(argv[1], result);
+
     return EXIT_SUCCESS;
 }
 
