@@ -3,14 +3,14 @@
 #include <libapp.h>
 #include <math.h>
 
-#define APPNAME "lcm"
+#define APPNAME "mcalc"
 
-typedef struct _Lcm
+typedef struct _MCalc
 {
     double C1;
     double L1;
 
-} Lcm;
+} MCalc;
 
 static void usage_exit()
 {
@@ -24,10 +24,10 @@ static void usage_exit()
     exit(EXIT_FAILURE);
 }
 
-static void _lcm_get_path(CString *result)
+static void _mcalc_get_path(CString *result)
 {
     get_homedir(result);
-    cstr_append(result, "/.config/lcm.conf");
+    cstr_append(result, "/.config/mmcalc.conf");
 }
 
 static void _read_key(CIniSection *section, const char *key, double *result)
@@ -42,36 +42,36 @@ static void _read_key(CIniSection *section, const char *key, double *result)
         *result = value;
 }
 
-static bool lcm_read(Lcm *lcm)
+static bool mcalc_read(MCalc *mcalc)
 {
     CStringAuto *inipath = cstr_new_size(64);
-    _lcm_get_path(inipath);
+    _mcalc_get_path(inipath);
 
     CIniFileAuto *inifile = cinifile_new();
 
     if (!cinifile_read(inifile, c_str(inipath)))
         return false;
 
-    CIniSection *section = cinifile_section(inifile, "LCM");
+    CIniSection *section = cinifile_section(inifile, "MCalc");
     if (!section)
         return false;
 
-    _read_key(section, "C1", &(lcm->C1));
-    _read_key(section, "L1", &(lcm->L1));
+    _read_key(section, "C1", &(mcalc->C1));
+    _read_key(section, "L1", &(mcalc->L1));
     
     // add bridge resistors
-    //~ _read_key(section, "C1", &(lcm->C1));
-    //~ _read_key(section, "C1", &(lcm->C1));
-    //~ _read_key(section, "C1", &(lcm->C1));
-    //~ _read_key(section, "C1", &(lcm->C1));
+    //~ _read_key(section, "C1", &(mcalc->C1));
+    //~ _read_key(section, "C1", &(mcalc->C1));
+    //~ _read_key(section, "C1", &(mcalc->C1));
+    //~ _read_key(section, "C1", &(mcalc->C1));
 
     return true;
 }
 
-static bool lcm_save(Lcm *lcm)
+static bool mcalc_save(MCalc *mcalc)
 {
     CStringAuto *inipath = cstr_new_size(64);
-    _lcm_get_path(inipath);
+    _mcalc_get_path(inipath);
     
     CFileAuto *file = cfile_new();
 
@@ -79,10 +79,10 @@ static bool lcm_save(Lcm *lcm)
         return false;
 
     CStringAuto *temp = cstr_new_size(32);
-    cfile_write(file, "[LCM]\n");
-    cstr_fmt(temp, "C1=%.6e\n", lcm->C1);
+    cfile_write(file, "[MCalc]\n");
+    cstr_fmt(temp, "C1=%.6e\n", mcalc->C1);
     cfile_write(file, c_str(temp));
-    cstr_fmt(temp, "L1=%.6e\n", lcm->L1);
+    cstr_fmt(temp, "L1=%.6e\n", mcalc->L1);
     cfile_write(file, c_str(temp));
     cfile_write(file, "\n");
 
@@ -97,7 +97,7 @@ static void print_result(char *fname, double result)
         printf("%s: %lf\n", fname, result);
 }
 
-int lcm_cal(Lcm *lcm, int argc, char **argv)
+int mcalc_cal(MCalc *mcalc, int argc, char **argv)
 {
     // f1 f2 Cref
     
@@ -110,48 +110,48 @@ int lcm_cal(Lcm *lcm, int argc, char **argv)
     double f2_2 = pow(f2, 2);
     double Cref = strtod(argv[4], NULL);
     
-    lcm->C1 = Cref*f2_2/(f1_2-f2_2);
-    lcm->L1 = 1/(4*pow(M_PI, 2)*f1_2*lcm->C1);
+    mcalc->C1 = Cref*f2_2/(f1_2-f2_2);
+    mcalc->L1 = 1/(4*pow(M_PI, 2)*f1_2*mcalc->C1);
 
-    print_result("C1", lcm->C1);
-    print_result("L1", lcm->L1);
+    print_result("C1", mcalc->C1);
+    print_result("L1", mcalc->L1);
     
-    lcm_save(lcm);
+    mcalc_save(mcalc);
     
     return EXIT_SUCCESS;
 }
 
-int lcm_c(Lcm *lcm, int argc, char **argv)
+int mcalc_c(MCalc *mcalc, int argc, char **argv)
 {
     if (argc != 4)
         usage_exit();
     
     double f1 = strtod(argv[2], NULL);
     double f3 = strtod(argv[3], NULL);
-    double result = lcm->C1*((pow(f1, 2)/pow(f3, 2)) - 1);
+    double result = mcalc->C1*((pow(f1, 2)/pow(f3, 2)) - 1);
     
     print_result(argv[1], result);
 
     return EXIT_SUCCESS;
 }
 
-int lcm_l(Lcm *lcm, int argc, char **argv)
+int mcalc_l(MCalc *mcalc, int argc, char **argv)
 {
     if (argc != 4)
         usage_exit();
     
     double f1 = strtod(argv[2], NULL);
     double f3 = strtod(argv[3], NULL);
-    double result = lcm->L1*((pow(f1, 2)/pow(f3, 2)) - 1);
+    double result = mcalc->L1*((pow(f1, 2)/pow(f3, 2)) - 1);
     
     print_result(argv[1], result);
 
     return EXIT_SUCCESS;
 }
 
-int lcm_rc(Lcm *lcm, int argc, char **argv)
+int mcalc_rc(MCalc *mcalc, int argc, char **argv)
 {
-    (void) lcm;
+    (void) mcalc;
     
     if (argc != 4)
         usage_exit();
@@ -165,9 +165,9 @@ int lcm_rc(Lcm *lcm, int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
-int lcm_ip(Lcm *lcm, int argc, char **argv)
+int mcalc_ip(MCalc *mcalc, int argc, char **argv)
 {
-    (void) lcm;
+    (void) mcalc;
     
     if (argc != 4)
         usage_exit();
@@ -188,29 +188,29 @@ int lcm_ip(Lcm *lcm, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    Lcm lcm;
-    lcm.C1 = 1.076879e-09;
-    lcm.L1 = 100e-6;
+    MCalc mcalc;
+    mcalc.C1 = 1.076879e-09;
+    mcalc.L1 = 100e-6;
     
-    lcm_read(&lcm);
+    mcalc_read(&mcalc);
 
     if (argc < 2)
         usage_exit();
 
     if (strcmp(argv[1], "cal") == 0)
-        return lcm_cal(&lcm, argc, argv);
+        return mcalc_cal(&mcalc, argc, argv);
     
     if (strcmp(argv[1], "c") == 0)
-        return lcm_c(&lcm, argc, argv);
+        return mcalc_c(&mcalc, argc, argv);
     
     if (strcmp(argv[1], "l") == 0)
-        return lcm_l(&lcm, argc, argv);
+        return mcalc_l(&mcalc, argc, argv);
     
     if (strcmp(argv[1], "rc") == 0)
-        return lcm_rc(&lcm, argc, argv);
+        return mcalc_rc(&mcalc, argc, argv);
     
     if (strcmp(argv[1], "ip") == 0)
-        return lcm_ip(&lcm, argc, argv);
+        return mcalc_ip(&mcalc, argc, argv);
     
     return EXIT_FAILURE;
 }

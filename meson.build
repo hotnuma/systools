@@ -31,21 +31,21 @@ executable(
     install: true,
 )
 
-# lcm -------------------------------------------------------------------------
+# mcalc -----------------------------------------------------------------------
 
-lcm_deps = [
+mcalc_deps = [
     dependency('tinyc'),
 ]
 
-lcm_sources = [
-    'src/lcm.c',
+mcalc_sources = [
+    'src/mcalc.c',
 ]
 
 executable(
-    'lcm',
+    'mcalc',
     c_args: c_args,
-    dependencies: lcm_deps,
-    sources: lcm_sources,
+    dependencies: mcalc_deps,
+    sources: mcalc_sources,
     install: true,
 )
 
