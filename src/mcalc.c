@@ -27,7 +27,7 @@ static void usage_exit()
 static void _mcalc_get_path(CString *result)
 {
     get_homedir(result);
-    cstr_append(result, "/.config/mmcalc.conf");
+    cstr_append(result, "/.config/mcalc.conf");
 }
 
 static void _read_key(CIniSection *section, const char *key, double *result)
