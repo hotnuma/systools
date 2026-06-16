@@ -15,10 +15,19 @@ typedef struct _MCalc
 static void usage_exit()
 {
     printf("*** usage :\n");
+    
+    // LC meter
     printf("Calibration : %s cal f1 f2 cref\n", APPNAME);
     printf("C           : %s c f1 f2\n", APPNAME);
     printf("L           : %s l f1 f2\n", APPNAME);
+    
+    // reactance
+    printf("XL          : %s xl L f\n", APPNAME);
+    printf("XC          : %s xc R C\n", APPNAME);
+    
+    // rc filter
     printf("RC          : %s rc R C\n", APPNAME);
+    
     printf("abort...\n");
 
     exit(EXIT_FAILURE);
@@ -97,6 +106,8 @@ static void print_result(char *fname, double result)
         printf("%s: %lf\n", fname, result);
 }
 
+// lc meter -------------------------------------------------------------------
+
 int mcalc_cal(MCalc *mcalc, int argc, char **argv)
 {
     // f1 f2 Cref
@@ -149,6 +160,31 @@ int mcalc_l(MCalc *mcalc, int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
+// reactance ------------------------------------------------------------------
+
+double _xl(double v1, double v2)
+{
+    return 2*M_PI*v1*v2;
+}
+
+int mcalc_xl(MCalc *mcalc, int argc, char **argv)
+{
+    (void) mcalc;
+    
+    if (argc != 4)
+        usage_exit();
+    
+    double v1 = strtod(argv[2], NULL);
+    double v2 = strtod(argv[3], NULL);
+    double result = _xl(v1, v2);
+    
+    print_result(argv[1], result);
+
+    return EXIT_SUCCESS;
+}
+
+// rc filter ------------------------------------------------------------------
+
 int mcalc_rc(MCalc *mcalc, int argc, char **argv)
 {
     (void) mcalc;
@@ -156,14 +192,16 @@ int mcalc_rc(MCalc *mcalc, int argc, char **argv)
     if (argc != 4)
         usage_exit();
     
-    double R = strtod(argv[2], NULL);
-    double C = strtod(argv[3], NULL);
-    double result = 1/(2*M_PI*R*C);
+    double v1 = strtod(argv[2], NULL);
+    double v2 = strtod(argv[3], NULL);
+    double result = 1/_xl(v1, v2);
     
     print_result(argv[1], result);
 
     return EXIT_SUCCESS;
 }
+
+// inverse percent ------------------------------------------------------------
 
 int mcalc_ip(MCalc *mcalc, int argc, char **argv)
 {
@@ -205,6 +243,12 @@ int main(int argc, char **argv)
     
     if (strcmp(argv[1], "l") == 0)
         return mcalc_l(&mcalc, argc, argv);
+    
+    if (strcmp(argv[1], "xl") == 0)
+        return mcalc_xl(&mcalc, argc, argv);
+    
+    if (strcmp(argv[1], "xc") == 0)
+        return mcalc_rc(&mcalc, argc, argv);
     
     if (strcmp(argv[1], "rc") == 0)
         return mcalc_rc(&mcalc, argc, argv);
