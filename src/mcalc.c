@@ -23,10 +23,13 @@ static void usage_exit()
     
     // reactance
     printf("XL          : %s xl L f\n", APPNAME);
-    printf("XC          : %s xc R C\n", APPNAME);
+    printf("XC          : %s xc C f\n", APPNAME);
     
     // rc filter
     printf("RC          : %s rc R C\n", APPNAME);
+    
+    // inverse percent
+    printf("IP          : %s ip v1 v2\n", APPNAME);
     
     printf("abort...\n");
 
@@ -224,6 +227,8 @@ int mcalc_ip(MCalc *mcalc, int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
+// main -----------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
     MCalc mcalc;
@@ -234,6 +239,8 @@ int main(int argc, char **argv)
 
     if (argc < 2)
         usage_exit();
+    
+    // lc meter
 
     if (strcmp(argv[1], "cal") == 0)
         return mcalc_cal(&mcalc, argc, argv);
@@ -244,15 +251,21 @@ int main(int argc, char **argv)
     if (strcmp(argv[1], "l") == 0)
         return mcalc_l(&mcalc, argc, argv);
     
+    // reactance
+
     if (strcmp(argv[1], "xl") == 0)
         return mcalc_xl(&mcalc, argc, argv);
     
     if (strcmp(argv[1], "xc") == 0)
         return mcalc_rc(&mcalc, argc, argv);
     
+    // rc filter
+
     if (strcmp(argv[1], "rc") == 0)
         return mcalc_rc(&mcalc, argc, argv);
     
+    // inverse percent
+
     if (strcmp(argv[1], "ip") == 0)
         return mcalc_ip(&mcalc, argc, argv);
     
